@@ -19,4 +19,4 @@ No personal audio, reference voice cache, private behavior records, credentials,
 
 Repository: https://github.com/ChangfengHU/cartoon-video-skills
 
-At this checkpoint the GitHub repository has been created, but source push is pending GitHub authentication / browser local-file upload permission. Local commits are saved; CDN publication and package installation are independent and have succeeded. Do not describe the empty remote as a completed source push.
+Source publication completed on 2026-09-06. The `main` branch was pushed using a credential retrieved from the private vault, and the remote commit was verified against the local commit. Credentials were not written to the repository or persisted by the publication helper. CDN publication and package installation were also verified independently.
