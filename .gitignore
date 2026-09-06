@@ -1,0 +1,12 @@
+**/__pycache__/
+**/*.pyc
+.DS_Store
+.env*
+node_modules/
+private/
+**/*.wav
+**/*.mp3
+**/*.npz
+**/*.MOV
+**/*.mp4
+**/renders/

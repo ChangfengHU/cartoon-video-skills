@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "brand_id": "cartoon-xiaban",
+  "version": "0.2.0",
+  "display_name": "下班小人",
+  "name_status": "working_title_not_user_named",
+  "identity": {
+    "status": "direction_approved",
+    "canonical_reference": "assets/identity/approved-comic-v1.png",
+    "origin_reference": "assets/identity/character-reference-v1.png",
+    "invariants": ["大圆头", "三根稀疏头发", "小耳朵", "短袖衬衫与细领带", "简笔身体与深色裤子", "夸张表情"],
+    "origin": "本次对话中根据创作描述生成，后续漫画沿用初始图作参考；并非人工逐笔手绘",
+    "rights_status": "AI生成；未做商标或全球角色相似性清查，不承诺独占"
+  },
+  "visual": {
+    "status": "rendered_animation_direction_approved",
+    "medium": "暖纸底黑墨手绘线稿，少量铅笔排线",
+    "palette": {"paper": "#F8F1E3", "ink": "#292620", "accent": "#D88755"},
+    "text": "少量手写式中文；字幕单独排版，不依赖生图模型写长句",
+    "motion": "二维角色表演、道具动作、停顿与反应；镜头运动为辅"
+  },
+  "voice": {
+    "status": "audition_pending",
+    "direction": "卡通男孩声，可爱、轻微丧气、懒懒吐槽；清晰不尖锐、不故意哭腔",
+    "preferred_provider": "doubao",
+    "selected_voice_id": null,
+    "approved_sample": null,
+    "fallback": "用户允许设计原创合成音色；不默认回退成人女声",
+    "candidates": [
+      {
+        "name": "懒音绵宝",
+        "voice_id": "zh_male_lanxiaoyang_mars_bigtts",
+        "resource_id": "seed-tts-1.0",
+        "status": "requires_current_account_access_check",
+        "source": "https://www.volcengine.com/docs/6561/162929?lang=en"
+      },
+      {
+        "name": "亮嗓萌仔",
+        "voice_id": "zh_male_dongmanhaimian_mars_bigtts",
+        "resource_id": "seed-tts-1.0",
+        "status": "listed_not_tested",
+        "source": "https://www.volcengine.com/docs/6561/162929?lang=en"
+      }
+    ]
+  },
+  "music": {
+    "status": "research_requested_not_selected",
+    "default_mode": "audition_then_select",
+    "selected_track": null,
+    "direction": "研究同类喜剧动画的实际配乐：轻巧拨弦、笨拙低音、稀疏木块或木琴；保留包袱前的突然安静，不按热度盲选",
+    "rights_status": "尚无音轨；不得声称已有专属配乐或独占授权"
+  },
+  "output_defaults": {"width": 1080, "height": 1920, "fps": 30, "max_seconds": 60, "language": "zh", "renderer": "hyperframes"},
+  "assets": [
+    {
+      "id": "character-reference-v1",
+      "path": "assets/identity/character-reference-v1.png",
+      "sha256": "f8fabb5de691868c847bb9726add24d70f9defca0839e5bfe5640359845d0ba3",
+      "status": "user_approved_direction",
+      "role": "最初认可的单幅角色及纸上手绘观感"
+    },
+    {
+      "id": "approved-comic-v1",
+      "path": "assets/identity/approved-comic-v1.png",
+      "sha256": "a1fc3e00087a4c2dedf262c094a520609cf4a69a9ea2ef9f879c806534b193a3",
+      "status": "user_approved_direction",
+      "role": "首集六格故事；人物全身、表情、服装与道具比例参考"
+    },
+    {
+      "id": "acting-sheet-v2",
+      "path": "assets/identity/acting-sheet-v2.png",
+      "sha256": "e91e85fc5c8c2498727a7c0ae86c86f65a98be950be073262ddab757d719f6dd",
+      "status": "rendered_animation_direction_approved",
+      "role": "实际成片1536×1024六姿态图集，3列2行，512像素格；不透明暖纸底，非骨骼动画"
+    }
+  ]
+}
