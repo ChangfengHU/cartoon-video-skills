@@ -24,6 +24,26 @@
 
 同画面、同人声做无BGM/A/B约15秒对照，不同时改剧本与音色。配音清晰优先，测量响度并试听，不能用统一音量百分比套所有音乐。ducking和骤停用引擎音频技能。
 
-## 当前边界
+## 已验证的案例与边界
 
-已核查的旧本地抖音研究原型仅输出标题、作者、时长与互动指标，没有输出music字段，也没完成音源分离和授权判断。不能声称任何浏览器视频都已能提取纯BGM。下一步给解析适配器增加音乐元数据与来源层级，再用真实样本验证。公共包不包含私人采集器与账号连接。
+本地研究原型已加入music的ID、标题、作者、播放地址和未知权利状态。一次真实抖音样本经音频相关性比对，与作者发布的《Scheming Weasel (faster version)》吻合，成片使用作者官方音源。它是选曲流程的成功案例，不是今后的默认歌曲，也不是当前热榜证明。
+
+这仍不等于任何视频都能取得干净配乐，不包括已完成的通用音源分离或自动授权判断。公开包不包含私人采集器、账号连接或该曲MP3。新环境先发现可用工具；没有抖音连接时查公开曲库，不伪称已访问95机器。
+
+## 按剧情选，不按品牌写死歌曲
+
+每片先写MUSIC_PLAN.json：场景id、情绪/功能标签、能量、密度、旁白区间、刻意静音区间、起止原因。先选2–4个有差异的候选；同一故事可以使用1首的不同片段，也可以在真实情绪转折处换曲，不强制每镜换一首。
+
+有私有素材库时按 [asset-library.md](asset-library.md) 查询旧曲与使用反馈，但仍为本片主动检索新候选、核验平台与用途并试听比较。索引和历史认可不替代本次选曲；保存来源卡、失败理由及作品快照，让库成长而不是固定旧曲。
+
+候选卡包含真实来源URL、作者、用途范围、权利证据URL、可播放本地文件、是否纯音乐、已听区间以及未知项。先排除来源或用途不合适的候选，再比较叙事匹配、声音密度、与人声的竞争、可剪辑性。无法听音时标为仅元数据筛选；不要把自动打分称为听觉判断或“最合适”的客观证明。
+
+使用scripts/plan_music.py可对已检索且有许可证据的候选做透明规则排序，输出逐场景选择或no_eligible_track。它不负责搜索、下载、判断法律授权或听音；这些由调用agent及可用连接完成。刻意静音优先，不能拿默认曲偷偷补齐失败场景。
+
+调用：`python3 <skill目录>/scripts/plan_music.py --plan MUSIC_PLAN.json --catalog MUSIC_CATALOG.json --asset-root <本作品目录> --output <尚不存在的候选结果.json>`。
+
+两份JSON的schema_version均为1。plan需要platform（如douyin）、clean_frame（默认true）与scenes数组；每镜含id、start/end（秒）、tags（字符串数组）、energy/density（0–1），或者silence:true及reason。catalog的tracks每项含id、file（作品目录内相对文件）、tags、energy/density、duration_seconds、source_url、rights_evidence_url、rights_status、allowed_platforms、instrumental、attribution及attribution_placement。只有来源证据已由调用者核查且rights_status为verified_for_project、用途平台匹配、instrumental:true的本地曲目进入排序。attribution_placement为on_screen_required的曲目会被clean_frame排除。audition_status如未填，默认为not_listened。
+
+能量和标签是调用者基于证据的编辑判断，不是假装测出的音频数据。相同输入结果稳定；改变场景意图会改变排序，曲目不硬编码。输出仍需编辑者试听和决定截取点，不能直接当成“最好音乐”的证明。
+
+画面默认无音乐来源页脚。需要署名的轨道写入PUBLICATION.md；如果许可要求画内署名，改选符合干净画面要求的音轨。曲目、源链接、截取区间、哈希、混音和剪辑情况留在私有制作台账。

@@ -1,6 +1,6 @@
 ---
 name: cartoon-xiaban
-description: "复用下班小人（三根头发圆头角色）的暖纸手绘形象、角色表演、喜剧分镜和声音设计，制作一分钟内卡通短视频。用户提到下班小人、这套小人或调用本 skill 时使用；新角色另建品牌 skill。"
+description: "复用下班小人（三根头发圆头角色）的暖纸手绘形象、喜剧分镜、情绪配音与按剧情选配乐，制作约90秒卡通短视频。用户提到下班小人、这套小人或调用本 skill 时使用；新角色另建品牌 skill。"
 ---
 
 # 下班小人 · 手绘卡通品牌
@@ -9,7 +9,7 @@ description: "复用下班小人（三根头发圆头角色）的暖纸手绘形
 
 ## 先确定使用的版本
 
-读取 [assets/brand.json](assets/brand.json)，查看角色参考与六姿态图集。v0.2 已保存实际成片中获认可的动画方向与实现；内容趣味和配音仍需优化，BGM 已进入选曲阶段、尚无定稿。不能把生成成功、方向认可、最终确认混为一谈。
+读取 [assets/brand.json](assets/brand.json)，查看角色参考与六姿态图集。v0.3 沉淀用户认可的《AI替我省的时间去哪了》方向：角色受刺激后反应、逐句表演、反转停乐、动作音效。用户进一步要求约90秒、更饱满表演、干净画面和按剧情选音乐；这些是制作标准，不代表每个新候选已获认可。私人声线与第三方音乐不随公开包分发。
 
 沿用当前包，不因为新选题重设计角色。用户指定新角色或新品牌时，读 [references/new-brand.md](references/new-brand.md)，另建 skill。用户本次明确要求可以覆盖默认值，但一次试验不自动改写长期品牌。
 
@@ -17,17 +17,28 @@ description: "复用下班小人（三根头发圆头角色）的暖纸手绘形
 
 1. 阅读 [references/visual-identity.md](references/visual-identity.md) 与 [references/story-and-motion.md](references/story-and-motion.md)。用参考图约束新姿势，先保证人物是同一个，再设计新场景。
 2. 新故事先读 [references/comedy-writing.md](references/comedy-writing.md)：先有值得讲的误会、升级和反转，再排动画，不复读示例结论。声音读 [references/voice-and-music.md](references/voice-and-music.md)；研究抖音配乐读 [references/music-research.md](references/music-research.md)。声线身份、台词表演、音乐作用分别决策。
+   使用可复用素材时读 [references/asset-library.md](references/asset-library.md)：先剧情→查私有旧库及反馈→仍主动检索新BGM→核验本片权利与试听→选择并冻结→使用后追加反馈。v0.4提供R2文件/索引脚本，不内置自动搜歌或听觉判断；入库不自动晋升默认角色、声线或歌曲。
 3. 为新作品建立独立目录并冻结品牌快照：
 
    ```bash
-   python3 <本skill目录>/scripts/prepare_project.py --output <尚不存在的项目目录> --topic "这次的主题"
+   python3 <本skill目录>/scripts/prepare_project.py --output <尚不存在的项目目录> --topic "这次的主题" --target-seconds 90
    ```
 
    脚本复制随包保存的参考素材、品牌档案和制作规则，写入 `BRAND_LOCK.json` 与 `BRAND_BRIEF.md`；拒绝覆盖已有目录。`--check-only` 只核验包内素材、哈希和状态，不调用云服务。
 4. 做视频先加载可用的 `hyperframes` 入口 skill；用户指定 Remotion 时遵从。引擎未安装就先说明依赖，不能声称本包自带渲染器或 TTS 模型。成功机制和可运行示例见 [references/acting-recipe.md](references/acting-recipe.md)，运行环境见 [references/local-runtime.md](references/local-runtime.md)。示例 `scripts/build-demo.mjs` 是一个固定故事的实现，不是所有新选题套用的模板。
-5. 按实际音频时长排镜头，交付可播放 MP4。先看过画面、检查转场与声画同步，再说完成；技术检查通过不代表用户已经认可观感。
+5. 远程或新机器先读 [references/voice-routing.md](references/voice-routing.md)：配音是可替换服务，不是某台 Mac 或本地模型的硬依赖。用已授权、已验证可用的配音路径完成短测，冻结音频后再按真实时长排镜头。交付可播放 MP4，检查画面、转场与声画同步；技术检查通过不代表用户已经认可观感。
 
-默认是一分钟以内中文竖屏故事，可被本次用途覆盖。拿不到声音服务权限时报告具体错误，不自动购买、开通服务、换成人声或下载大模型。
+默认目标90秒，常用范围80–100秒，由实测旁白和表演停顿决定；用户指定其他时长时覆盖。不要把旧片慢放、重复镜头或多写总结凑时长。固定十句的旧demo仍是短片示例，不是90秒生成器。拿不到声音服务权限时报告具体错误，并在用户已授权的备用配音范围内继续；不自动购买、开通服务或下载大模型。切换预置声线时明确说明它不再是本人的克隆声线。
+
+## 每片必须落实的新版要求
+
+先读 [references/episode-direction.md](references/episode-direction.md) 和 [references/quality-regression.md](references/quality-regression.md)，查看随包的 [认可成片抽帧](assets/calibration/approved-95s-encoded-contact.jpg)。每个重要转折写出角色的欲望、视线、表情变化、预备动作、反应与停顿；用真实音频重新排时序。至少设计两段升级和一个结尾回扣，避免长篇旁白配姿势轮播。用户提供认可成片时，它是表现力基准；导出成功或同色调不代表同品质。按质量参考先做本故事的短动作样片，解决人物、道具与接触问题后再扩成整片；不要到成片QA时才将可修复的退步列为“局部不足”。
+
+- 配音：沿用用户指定声线，逐句标注表演意图、重音、情绪变化和停顿；强度有高低，不全片喊、不统一加速。私人声线在运行环境绑定，不写入公共包。
+- 配乐：每次先分析故事/场景，再检索候选、核实来源和使用范围、选择与剪辑。品牌不设固定歌曲；同一首跨几镜、换段、换曲或静音都可以，由剧情决定。
+- 音效：绑定可见接触、通知、心理反应和转场；保留安静与末句尾音，不给每个元素都塞whoosh。
+- 画面：默认不烧录“AI辅助创作”、音乐来源、工具署名或其他说明性页脚。许可要求的署名移入随片发布说明；隐式合成标记及适用的平台申报不随意移除。若素材必须画内署名而用户不要，换素材，不能静默违约。
+- 交付：MP4 + 发布说明/必要署名 + 私有制作记录；公共skill不附私人参考、合成声线样本、账号或无分发权的音乐。
 
 ## 本品牌的创作重点
 

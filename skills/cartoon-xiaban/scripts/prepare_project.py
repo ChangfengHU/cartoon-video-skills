@@ -16,9 +16,14 @@ REFERENCES = (
     "references/visual-identity.md",
     "references/story-and-motion.md",
     "references/voice-and-music.md",
+    "references/voice-routing.md",
+    "references/local-runtime.md",
     "references/comedy-writing.md",
     "references/acting-recipe.md",
     "references/music-research.md",
+    "references/episode-direction.md",
+    "references/quality-regression.md",
+    "references/asset-library.md",
 )
 
 
@@ -72,7 +77,7 @@ def validate(root: Path) -> tuple[dict, list[str]]:
     music = profile["music"]
     if music["status"] == "user_approved" and music.get("selected_track") not in names:
         raise ValueError("Approved music requires a checksummed track")
-    files = ["SKILL.md", "assets/brand.json", *REFERENCES, *sorted(names)]
+    files = ["SKILL.md", "assets/brand.json", "scripts/asset_library.py", "scripts/plan_music.py", *REFERENCES, *sorted(names)]
     for name in files:
         inside(root, name)
     # Credential values never belong in profile snapshots. IDs are allowed, auth values are not.
@@ -94,10 +99,14 @@ def main() -> int:
     parser.add_argument("--output", type=Path, help="A new, non-existing project directory")
     parser.add_argument("--topic", default="", help="Topic for this work only; does not change the brand")
     parser.add_argument("--check-only", action="store_true")
+    parser.add_argument("--target-seconds", type=int, default=None, help="Story target, not time stretching")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     try:
         profile, files = validate(root)
+        target_seconds = args.target_seconds or profile["output_defaults"].get("target_seconds", 90)
+        if args.target_seconds is not None and not 10 <= args.target_seconds <= 600:
+            raise ValueError("target-seconds must be between 10 and 600")
         states = {part: profile[part]["status"] for part in ("identity", "visual", "voice", "music")}
         if args.check_only:
             print(json.dumps({"valid": True, "brand_id": profile["brand_id"], "version": profile["version"], "assets": len(profile["assets"]), "states": states}, ensure_ascii=False, indent=2))
@@ -124,6 +133,8 @@ def main() -> int:
             "brand_version": profile["version"],
             "created_at_utc": datetime.now(timezone.utc).isoformat(),
             "topic": args.topic,
+            "target_seconds": target_seconds,
+            "output_defaults": {**profile["output_defaults"], "target_seconds": target_seconds},
             "states": states,
             "selected_voice_id": profile["voice"].get("selected_voice_id"),
             "selected_music": profile["music"].get("selected_track"),
@@ -134,6 +145,8 @@ def main() -> int:
         brief = f"""# 品牌视频任务
 
 主题：{args.topic or '由本次用户请求决定'}
+
+目标时长：{target_seconds}秒，以实测语音和动作停顿落地，不慢放凑时长。
 
 品牌：{profile['display_name']}（{profile['brand_id']} v{profile['version']}）
 

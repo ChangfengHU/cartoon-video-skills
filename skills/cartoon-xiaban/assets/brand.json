@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "brand_id": "cartoon-xiaban",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "display_name": "下班小人",
   "name_status": "working_title_not_user_named",
   "identity": {
@@ -13,7 +13,7 @@
     "rights_status": "AI生成；未做商标或全球角色相似性清查，不承诺独占"
   },
   "visual": {
-    "status": "rendered_animation_direction_approved",
+    "status": "rendered_comedy_direction_approved",
     "medium": "暖纸底黑墨手绘线稿，少量铅笔排线",
     "palette": {"paper": "#F8F1E3", "ink": "#292620", "accent": "#D88755"},
     "text": "少量手写式中文；字幕单独排版，不依赖生图模型写长句",
@@ -44,14 +44,31 @@
     ]
   },
   "music": {
-    "status": "research_requested_not_selected",
-    "default_mode": "audition_then_select",
+    "status": "scene_adaptive_direction_approved",
+    "default_mode": "research_per_story_then_select_per_beat",
     "selected_track": null,
     "direction": "研究同类喜剧动画的实际配乐：轻巧拨弦、笨拙低音、稀疏木块或木琴；保留包袱前的突然安静，不按热度盲选",
-    "rights_status": "尚无音轨；不得声称已有专属配乐或独占授权"
+    "rights_status": "每片单独核验；成功案例用曲不晋升为固定BGM，不随包分发",
+    "selection_policy": "先剧情和情绪曲线，后检索候选与来源核实；音乐可延续、切段、换曲或有意留白",
+    "attribution_placement": "publication_description_or_companion_credits"
   },
-  "output_defaults": {"width": 1080, "height": 1920, "fps": 30, "max_seconds": 60, "language": "zh", "renderer": "hyperframes"},
+  "output_defaults": {"width": 1080, "height": 1920, "fps": 30, "target_seconds": 90, "preferred_range_seconds": [80, 100], "max_seconds": 105, "language": "zh", "renderer": "hyperframes", "burn_in_explanatory_footer": false, "burn_in_music_credit": false},
   "assets": [
+    {
+      "id": "approved-95s-encoded-calibration",
+      "path": "assets/calibration/approved-95s-encoded-contact.jpg",
+      "sha256": "5cb5c7c7b128fd4385bc8b2bdf9a5f9e3c30e466f697c99e190c545b34247d90",
+      "status": "user_approved_film_visual_calibration_only",
+      "role": "从用户认可的95秒成片实际编码抽帧，校准画面层级、脸部可读性、线条与表演；不是新姿态默认，也不是可直接播进新片的图集",
+      "source_video_sha256": "d31a17878802add7eb32d99d318d876ad30318a01c84c9bd760f349cfc82ade4"
+    },
+    {
+      "id": "acting-sheet-v3-candidate",
+      "path": "assets/identity/acting-sheet-v3-candidate.png",
+      "sha256": "5dd4a4589ffc42d1eb32c381d0ae2a1a9f9f848c6a136689fa988211193d4fc4",
+      "status": "candidate_generated_not_yet_user_approved",
+      "role": "新九姿态3列3行暖纸图集：得意、傻眼、憋气、嘘、装认真、躺椅、偷乐、阻挡、吃饭；保留v2不覆盖"
+    },
     {
       "id": "character-reference-v1",
       "path": "assets/identity/character-reference-v1.png",

@@ -1,4 +1,4 @@
 interface:
   display_name: "下班小人·手绘卡通"
   short_description: "复用圆头小人、喜剧表演与暖纸手绘动画，先打磨故事，再试听配音和背景音乐"
-  default_prompt: "使用 $cartoon-xiaban，以这套小人形象制作一个一分钟内的手绘卡通视频。"
+  default_prompt: "使用 $cartoon-xiaban，以这套小人形象制作约90秒的手绘卡通视频，强化情绪表演，按剧情选音乐，画面不放解释性页脚。"

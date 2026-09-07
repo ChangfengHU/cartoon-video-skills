@@ -44,10 +44,34 @@ class BrandSnapshotTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "checksum mismatch"):
                 prepare.validate(ROOT)
 
+    def test_quality_criteria_are_frozen_with_the_project(self):
+        with tempfile.TemporaryDirectory(prefix="cartoon-quality-test-") as temp:
+            output = Path(temp) / "episode"
+            result = subprocess.run([sys.executable, str(SCRIPT), "--output", str(output)], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            source = ROOT / "references/quality-regression.md"
+            copied = output / "brand/references/quality-regression.md"
+            self.assertEqual(source.read_bytes(), copied.read_bytes())
+            lock = json.loads((output / "BRAND_LOCK.json").read_text())
+            entry = next(x for x in lock["files"] if x["path"] == "brand/references/quality-regression.md")
+            self.assertEqual(entry["sha256"], prepare.digest(source))
+
     def test_asset_path_cannot_escape_pack(self):
         for path in ("../outside.png", "/tmp/outside.png"):
             with self.assertRaisesRegex(ValueError, "Unsafe asset path"):
                 prepare.inside(ROOT, path)
+
+    def test_approved_visual_calibration_is_copied_without_promoting_candidates(self):
+        profile, _ = prepare.validate(ROOT)
+        reference = next(x for x in profile["assets"] if x["id"] == "approved-95s-encoded-calibration")
+        self.assertEqual(reference["status"], "user_approved_film_visual_calibration_only")
+        candidate = next(x for x in profile["assets"] if x["id"] == "acting-sheet-v3-candidate")
+        self.assertEqual(candidate["status"], "candidate_generated_not_yet_user_approved")
+        with tempfile.TemporaryDirectory(prefix="cartoon-calibration-test-") as temp:
+            output = Path(temp) / "episode"
+            result = subprocess.run([sys.executable, str(SCRIPT), "--output", str(output)], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual((ROOT / reference["path"]).read_bytes(), (output / "brand" / reference["path"]).read_bytes())
 
     def test_falsely_approved_voice_is_rejected(self):
         profile = json.loads((ROOT / "assets/brand.json").read_text())

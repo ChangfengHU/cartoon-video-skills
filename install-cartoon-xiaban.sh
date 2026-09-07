@@ -4,8 +4,8 @@
 set -euo pipefail
 
 SKILL_NAME="cartoon-xiaban"
-ZIP_URL="https://skill.vyibc.com/cartoon-xiaban/release/cartoon-xiaban-20260906063744.zip"
-ZIP_SHA256="aea2b27dcbc19530ea05494e52d18873536c03ff29c4dcabb0984e661a2ecf72"
+ZIP_URL="https://skill.vyibc.com/cartoon-xiaban/release/cartoon-xiaban-20260907105344.zip"
+ZIP_SHA256="90d4a2a6eba5a60bfb2ec9f68ec3608b12820a6793346a7e0fe3964ba47fc2a8"
 
 # ── 工具选择 ──────────────────────────────────────────────
 TARGET="${1:-}"
@@ -56,11 +56,22 @@ case "$TARGET" in
       "$HOME/.gemini/antigravity/skills"
       "$HOME/.copilot/skills"
       "$HOME/.openclaw/workspace/skills"
-      "$HOME/.agents/skills"
       "$HOME/.hermes/skills/devops"
     ) ;;
   *) echo "❌ 不支持的 target: $TARGET"; exit 1 ;;
 esac
+
+# Codex user discovery follows ~/.agents/skills; keep a single canonical copy.
+CODEX_LINK="$HOME/.agents/skills/${SKILL_NAME}"
+CODEX_DEST="$HOME/.codex/skills/${SKILL_NAME}"
+if [[ "$TARGET" == "codex" || "$TARGET" == "all" ]]; then
+  if [[ -e "$CODEX_LINK" || -L "$CODEX_LINK" ]]; then
+    if [[ ! -L "$CODEX_LINK" || "$(readlink "$CODEX_LINK")" != "$CODEX_DEST" ]]; then
+      echo "❌ 已有独立发现目录，请先保留并处理：$CODEX_LINK" >&2
+      exit 1
+    fi
+  fi
+fi
 
 echo ""
 echo "🚀 安装 ${SKILL_NAME} ..."
@@ -126,6 +137,14 @@ for BASE_DIR in "${DIRS[@]}"; do
   echo "  ✅ → $DEST"
 done
 
+if [[ "$TARGET" == "codex" || "$TARGET" == "all" ]]; then
+  mkdir -p "$HOME/.agents/skills"
+  if [[ ! -L "$CODEX_LINK" ]]; then
+    ln -s "$CODEX_DEST" "$CODEX_LINK"
+  fi
+  echo "  ✅ Codex 发现链接 → $CODEX_LINK"
+fi
+
 echo ""
-echo "✅ 安装完成！对 AI 说触发词即可使用 ${SKILL_NAME}。"
+echo "✅ 安装完成！下一轮可使用 ${SKILL_NAME}；若未刷新，请重启 Codex。"
 echo ""

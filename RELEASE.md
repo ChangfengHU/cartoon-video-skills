@@ -1,22 +1,26 @@
-# cartoon-xiaban v0.2.0
+# cartoon-xiaban v0.4.0
 
 ## Published installer
 
 ```bash
-bash <(curl -fsSL 'https://skill.vyibc.com/install-cartoon-xiaban.sh?ts=20260906063744') codex
+bash <(curl -fsSL 'https://skill.vyibc.com/install-cartoon-xiaban.sh?ts=20260907105344') codex
 ```
 
-Omit `codex` for the tool-selection menu. Installing updates this named skill only; an existing installation is moved to a timestamped backup first. It does not install models or cloud credentials.
+Omit `codex` for the tool-selection menu. Codex installation keeps the canonical directory at `~/.codex/skills/cartoon-xiaban` and creates a symlink at `~/.agents/skills/cartoon-xiaban` for user-level discovery. The skill is available on the next turn; restart Codex if discovery has not refreshed.
 
-- Package: https://skill.vyibc.com/cartoon-xiaban/release/cartoon-xiaban-20260906063744.zip
-- SHA-256: `aea2b27dcbc19530ea05494e52d18873536c03ff29c4dcabb0984e661a2ecf72`
+Installing updates this named skill only; an existing installation is moved to a timestamped hidden backup first. An independent, conflicting discovery directory is preserved and reported before installation. The installer does not install models, replace system Node or configure cloud credentials.
+
+- Package: https://skill.vyibc.com/cartoon-xiaban/release/cartoon-xiaban-20260907105344.zip
+- SHA-256: `90d4a2a6eba5a60bfb2ec9f68ec3608b12820a6793346a7e0fe3964ba47fc2a8`
 - Publisher: https://github.com/ChangfengHU/skill-publisher
 - Publisher base revision: `e8a2f02c69af68ecd5b9247707d5b04b4ccb3612`
-- Local safety adjustment: generated installers move the existing named skill to a timestamped backup under the hidden .backups directory instead of deleting it. No upstream repository was changed.
+- Local publisher adjustments: required runtime upload credential, archive SHA-256 verification, recoverable named-skill backups and a single-copy Codex discovery symlink. The upstream publisher repository was not pushed or changed remotely.
 - Reviewed SOP contract included; it is optional adapter metadata, not an independently deployed video-generation service.
 
-No personal audio, reference voice cache, private behavior records, credentials, third-party tracks, model weights or fonts were uploaded. Current visual direction is approved; voice and music remain auditions, and comedy writing remains an improvement priority.
+v0.4.0 includes the v0.3.3 direction for approximately 90-second stories, richer acting, scene-driven music research and clean frames. It adds a Python-standard-library private R2 client for immutable records, feedback and project snapshots. Existing music in the library does not replace fresh music research and listening for each story.
+
+No personal audio, reference voice cache, private behavior records, credentials, third-party tracks, model weights, fonts or actual private library indexes are in the public package. Voice candidates remain unapproved by default; a voice selection for one private project does not change the public default.
 
 Repository: https://github.com/ChangfengHU/cartoon-video-skills
 
-Source publication completed on 2026-09-06. The `main` branch was pushed using a credential retrieved from the private vault, and the remote commit was verified against the local commit. Credentials were not written to the repository or persisted by the publication helper. CDN publication and package installation were also verified independently.
+Release date: 2026-09-07. Publication uses runtime credentials from the private vault. Package download, content hashes, installation and the GitHub remote commit are verified independently; detailed scope is recorded in [VALIDATION.md](VALIDATION.md).

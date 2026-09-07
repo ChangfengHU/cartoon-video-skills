@@ -3,8 +3,8 @@
   "skill": {
     "id": "cartoon-xiaban",
     "title": "Cartoon Xiaban",
-    "version": "0.2.0",
-    "description": "复用下班小人（三根头发圆头角色）的暖纸手绘形象、角色表演、喜剧分镜和声音设计，制作一分钟内卡通短视频。用户提到下班小人、这套小人或调用本 skill 时使用；新角色另建品牌 skill。"
+    "version": "0.4.0",
+    "description": "复用下班小人（三根头发圆头角色）的暖纸手绘形象、喜剧分镜、情绪配音与按剧情选配乐，制作约90秒卡通短视频。用户提到下班小人、这套小人或调用本 skill 时使用；新角色另建品牌 skill。"
   },
   "compatibility": {
     "sidecar": true,
@@ -68,7 +68,8 @@
       "Hints are internal adapter facts and must not be rendered as public Node inputs.",
       "The public Node interface remains instruction + materials.",
       "prepare_project.py only freezes a brand snapshot; it is not a complete video renderer. The agent follows SKILL.md and resolves authorized runtime dependencies before rendering.",
-      "No private voice, music, model weights, credentials or third-party fonts are bundled."
+      "No private voice, music, model weights, credentials or third-party fonts are bundled.",
+      "Optional scripts/asset_library.py requires runtime CF_ACCOUNT_ID, CF_API_TOKEN and R2_BUCKET, or hidden TTY credential input. It manages a private R2 library; no credentials or actual private library are bundled. It is not required for local brand preparation or a promise of automatic music search/listening."
     ]
   },
   "outputs": {
