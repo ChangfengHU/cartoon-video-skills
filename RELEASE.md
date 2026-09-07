@@ -8,7 +8,7 @@ bash <(curl -fsSL 'https://skill.vyibc.com/install-cartoon-xiaban.sh?ts=20260907
 
 - Package: https://skill.vyibc.com/cartoon-xiaban/release/cartoon-xiaban-20260907112558.zip
 - SHA256: `23e12dd029748bdaab9d54a9f146ad0c505feefb177e518c7e9e357fb321ad0f`
-- Companion MCP 1.0.0: https://cartoon-assets-mcp.2513120790.workers.dev/mcp
+- Companion MCP 1.0.0: https://cartoon-assets-mcp.vyibc.com/mcp (the packaged workers.dev endpoint remains compatible)
 - Composite Codex Plugin: `cartoon-video-studio` 0.1.0; see README for installation.
 
 Skill manages creative decisions; MCP manages private assets, feedback and frozen

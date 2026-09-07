@@ -57,3 +57,11 @@ codex plugin add cartoon-video-studio@personal
 如果本机已经有同名 `personal` marketplace，先检查冲突，不覆盖已有来源；独立 Skill + MCP 路径仍可用。插件安装后用环境变量 `CARTOON_ASSETS_TOKEN`，或插件内 `asset_mcp.py configure` 绑定本用户的专用凭据。
 
 服务源代码与限制：[services/assets-mcp/README.md](services/assets-mcp/README.md)。素材管理客户端支持 Python3.9+ 的 Mac、Linux ARM/AMD；不宣称附带的全部外部视频引擎和语音模型均跨架构通用。
+
+运行时还需允许下载 helper 发 HTTPS 请求。Codex 的 MCP 连接正常，不表示
+命令执行沙箱也允许联网；若沙箱禁网，先获得该任务所需网络权限再下载，不要
+更换令牌、开放 R2 公网或声称素材已冻结。此仓库不会修改全局沙箱策略。
+
+正式 MCP 地址：`https://cartoon-assets-mcp.vyibc.com/mcp`。
+v0.5客户端中的 workers.dev 地址继续兼容，不必重新配置已正常工作的187；
+Fleet 等其他 Cloudflare Worker 使用正式域名做服务间调用。

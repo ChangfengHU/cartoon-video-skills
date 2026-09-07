@@ -45,6 +45,12 @@ binding names the existing authorized deployment's bucket; change it for a
 different owner. Keep R2 managed-domain and custom-domain public access off.
 The Worker itself is the authenticated proxy; do not add another public proxy.
 
+Production custom domain is `cartoon-assets-mcp.vyibc.com`; the original
+`cartoon-assets-mcp.2513120790.workers.dev` stays compatible for installed clients.
+Same-account Worker callers (including Fleet) use the custom domain to avoid
+workers.dev Worker-to-Worker routing restrictions. For a different deployment
+owner, change both the bucket binding and the configured custom hostname.
+
 SDKs pinned in package-lock.json. Protocol is the official stateless MCP SDK v2
 handler with legacy-client compatibility. Secrets and request-body logging are
 not enabled. See repository VALIDATION.md for actual production checks.

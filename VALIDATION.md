@@ -6,7 +6,7 @@
   two defects (truthy but incorrectly typed rights/research fields, and an async
   file error escaping the HTTP handler); both were fixed and regression checked.
 - Production Worker `cartoon-assets-mcp`, private R2 binding only, no CF admin
-  credential at runtime. Version `585a4dd1-c05c-4a7b-a9d4-cdf79fca5ba5`.
+  credential at runtime. Final deployment version `3efc313d-89fc-4272-b374-f44c6090e0f2`.
 - Anonymous access returns401, disallowed browser Origin403, missing media404.
   MCP initialize / notification / tools-list / library-info handshake passed;
   exactly eight tools. Code tests verify read-only permissions and namespace
@@ -30,6 +30,52 @@
 
 Independent verification artifacts are retained in the private operator task;
 the historical v0.4 results below are not new video-generation claims.
+
+### Fresh187 acceptance and distribution
+
+- Public publisher package, source Skill, local installed Skill,187 installed
+  Skill, bundled Plugin Skill and a separate GitHub installation all have31
+  files and the same relative-path/hash tree digest:
+  `e7169e518923d64925f9097f8ae11b03230151316494e7e1ff9305379aab2252`.
+- GitHub source release `af46442e093d63548cd79b1b53359e50998bc86b` was fetched
+  through skill-installer into a new directory.187 also installed the actual
+  `cartoon-video-studio@personal` Plugin from GitHub in an isolated Codex home;
+  Codex resolved its MCP working directory and relative client arguments.
+-187 default uses one canonical Skill plus one standalone MCP entry, not both
+  plugin and standalone copies simultaneously. Its scoped credential belongs to
+  claude with0600 mode. Prior configuration values remained intact; CLI added
+  the new MCP and trust records for the two new acceptance workspaces. No global
+  AGENTS file, TTS model change or old-session deletion was made.
+- First fresh task `01a07d21-5289-74f3-93d3-a581f028df90` correctly completed
+  MCP queries and project recovery but reported download failure because its
+  shell sandbox had no network. It did not falsely report a verified file.
+- Second **new** task `01a07d23-7d50-7610-b21f-e94121996068` used task-scoped
+  network permission with workspace-write; global sandbox settings were not
+  changed. It read the installed Skill, completed all search/feedback pages,
+  recovered the previous project, downloaded52844bytes and independently
+  matched SHA256 `72923e69d03bbaba0c0d59e07bf021c11ecf3508761f97fedff04d5d9ce064c0`.
+  It retained the requirement to research new music even when old tracks exist.
+  This was not a video, listening or aesthetic-quality acceptance run.
+
+### Fleet registration
+
+- Fleet hub contains all three entries: Skill `cartoon-xiaban`0.5.0, MCP
+  `vyibc-cartoon-assets`1.0.0, Plugin `cartoon-video-studio`0.1.0.
+- Public registry shows the MCP's **eight live-discovered tools**, not only a
+  fallback count. Both Fleet origins report15 MCPs /6 Skills /2 Plugins with
+  no broken dependencies. The existing20 capability entries remain unchanged.
+- Fleet's protected administrator configuration may resolve the dedicated
+  scoped asset token; anonymous token retrieval returns401. Public registry
+  does not expose that token or its Vault locator. No CF management token is
+  used for asset access. Standard JSON/SSE discovery compatibility was added.
+- Formal custom domain: `https://cartoon-assets-mcp.vyibc.com/mcp`.
+  Exact DNS/Worker-domain absence was checked before creation. Anonymous access
+  still returns401. Existing workers.dev clients continue to work. The domain
+  enables same-account Worker-to-Worker discovery without broad Fleet fetch
+  flags or service-binding changes; private R2 public access remains disabled.
+- Fleet source change was deployed content-only and verified without changing
+  existing runtime bindings/configuration. Fleet version
+  `563018e3-b3e4-4840-8e03-10bddc1bb3ad`.
 
 ## Historical v0.4.0 Validation
 
