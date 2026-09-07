@@ -1,0 +1,21 @@
+{
+  "name": "cartoon-video-studio",
+  "version": "0.1.0",
+  "description": "下班小人视频创作 Skill + 私有素材管理 MCP。配乐每片重新研究，素材跨会话积累。",
+  "author": {
+    "name": "ChangfengHU"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "下班小人视频工作室",
+    "shortDescription": "Skill 创作视频，MCP 管理私有素材",
+    "longDescription": "保持角色、手绘风格与喜剧表演标准，通过已授权素材服务积累图片、音效、配乐来源与作品反馈。渲染、图像和配音服务需运行环境另行提供。",
+    "developerName": "ChangfengHU",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "defaultPrompt": ["使用下班小人做一个约90秒的有趣故事，先查素材库，同时研究新的场景配乐。"],
+    "websiteURL": "https://github.com/ChangfengHU/cartoon-video-skills",
+    "brandColor": "#E7D9B9"
+  },
+  "mcpServers": "./.mcp.json"
+}

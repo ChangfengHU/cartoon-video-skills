@@ -1,4 +1,37 @@
-# v0.4.0 Validation
+# v0.5.0 Validation
+
+2026-09-07: no new video generation or quality-iteration loop was started.
+
+- 20 existing Skill tests + 12 service tests passed. Independent review reproduced
+  two defects (truthy but incorrectly typed rights/research fields, and an async
+  file error escaping the HTTP handler); both were fixed and regression checked.
+- Production Worker `cartoon-assets-mcp`, private R2 binding only, no CF admin
+  credential at runtime. Version `585a4dd1-c05c-4a7b-a9d4-cdf79fca5ba5`.
+- Anonymous access returns401, disallowed browser Origin403, missing media404.
+  MCP initialize / notification / tools-list / library-info handshake passed;
+  exactly eight tools. Code tests verify read-only permissions and namespace
+  isolation. These tests are not a complete third-party penetration audit.
+- Independent full pagination: all17 legacy records and all9 legacy feedback
+  preserved. One original notification SFX received a provenance-preserving v2
+  record for real integration validation: total18 records. This does not add
+  personal voice samples or imply fresh artistic approval.
+- Real media import, identical retry/dedup, feedback and project freeze passed.
+  A newly constructed client recovered the project and hash-checked its media.
+  Independent reviewer downloaded legacy character art and original SFX and the
+  v2 SFX; SHA256 and sizes matched. Public URLs do not expose these files.
+- Project fixture ID: `6e5456bf549b0375b8863028e56bac9edf322126daa03610d26acf81ed9ad962`.
+- Skill and Codex Plugin manifest validators passed. Publisher-generated ZIP was
+  SHA256-verified by actual macOS and187 Linux ARM installations. The previous
+  named Skill was backed up, not deleted.187's global MCP entry was added using
+  Codex CLI after a private backup of config.toml; other entries were preserved.
+- Source/public package contain no service secret, personal reference audio,
+  user clone, private catalog or third-party music. The public Plugin uses a
+  Python-standard-library scoped client, not a CF management credential.
+
+Independent verification artifacts are retained in the private operator task;
+the historical v0.4 results below are not new video-generation claims.
+
+## Historical v0.4.0 Validation
 
 Validated on 2026-09-07. This release preserves the v0.3.3 creative requirements and adds the private R2 asset-library workflow.
 

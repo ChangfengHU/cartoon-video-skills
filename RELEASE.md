@@ -1,4 +1,28 @@
-# cartoon-xiaban v0.4.0
+# cartoon-xiaban v0.5.0
+
+Published using [ChangfengHU/skill-publisher](https://github.com/ChangfengHU/skill-publisher).
+
+```bash
+bash <(curl -fsSL 'https://skill.vyibc.com/install-cartoon-xiaban.sh?ts=20260907112558') codex
+```
+
+- Package: https://skill.vyibc.com/cartoon-xiaban/release/cartoon-xiaban-20260907112558.zip
+- SHA256: `23e12dd029748bdaab9d54a9f146ad0c505feefb177e518c7e9e357fb321ad0f`
+- Companion MCP 1.0.0: https://cartoon-assets-mcp.2513120790.workers.dev/mcp
+- Composite Codex Plugin: `cartoon-video-studio` 0.1.0; see README for installation.
+
+Skill manages creative decisions; MCP manages private assets, feedback and frozen
+project selections across sessions. No CF management credential, personal voice,
+private index or third-party music is distributed. The MCP requires separately
+issued tenant/brand-scoped authorization. The old direct R2 script remains an
+operator fallback. All existing creative quality/acting/music requirements remain.
+
+New media <=20MB per authenticated upload; paginated keyword search, not semantic
+ranking. Existing v1 data remains intact. No D1 introduced at the current scale.
+No video or TTS model is installed by this release. Public installation does not
+grant access to the owner's private material library.
+
+## Historical v0.4.0 release (superseded)
 
 ## Published installer
 

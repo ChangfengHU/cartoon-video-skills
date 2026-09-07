@@ -1,8 +1,10 @@
+node_modules/
+.wrangler/
+.dev.vars*
+.env*
 **/__pycache__/
 **/*.pyc
 .DS_Store
-.env*
-node_modules/
 private/
 **/*.wav
 **/*.mp3

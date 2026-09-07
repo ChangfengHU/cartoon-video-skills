@@ -1,0 +1,9 @@
+{
+  "name": "vyibc-cartoon-assets-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {"test": "node --test test/*.test.mjs", "deploy": "wrangler deploy"},
+  "dependencies": {"agents": "0.22.0", "@modelcontextprotocol/server": "2.0.0", "zod": "4.5.4"},
+  "devDependencies": {"wrangler": "4.129.1"}
+}

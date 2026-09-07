@@ -1,0 +1,10 @@
+{
+  "name": "cartoon-assets-mcp",
+  "main": "src/worker.mjs",
+  "compatibility_date": "2026-09-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "r2_buckets": [{"binding": "LIBRARY", "bucket_name": "cartoon-video-assets"}],
+  "observability": {"enabled": false}
+}

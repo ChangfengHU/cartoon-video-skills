@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "vyibc-cartoon-assets": {
+      "command": "python3",
+      "args": ["skills/cartoon-xiaban/scripts/asset_mcp.py", "stdio"],
+      "cwd": ".",
+      "env_vars": ["CARTOON_ASSETS_TOKEN", "CARTOON_ASSETS_MCP_URL"],
+      "startup_timeout_sec": 30,
+      "tool_timeout_sec": 90
+    }
+  }
+}

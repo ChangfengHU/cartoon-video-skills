@@ -4,8 +4,8 @@
 set -euo pipefail
 
 SKILL_NAME="cartoon-xiaban"
-ZIP_URL="https://skill.vyibc.com/cartoon-xiaban/release/cartoon-xiaban-20260907105344.zip"
-ZIP_SHA256="90d4a2a6eba5a60bfb2ec9f68ec3608b12820a6793346a7e0fe3964ba47fc2a8"
+ZIP_URL="https://skill.vyibc.com/cartoon-xiaban/release/cartoon-xiaban-20260907112558.zip"
+ZIP_SHA256="23e12dd029748bdaab9d54a9f146ad0c505feefb177e518c7e9e357fb321ad0f"
 
 # ── 工具选择 ──────────────────────────────────────────────
 TARGET="${1:-}"
