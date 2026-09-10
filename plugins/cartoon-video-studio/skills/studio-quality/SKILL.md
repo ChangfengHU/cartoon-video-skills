@@ -20,3 +20,5 @@ description: 对工作室实际成片与连续动作进行质量检查，记录�
 可用 ../cartoon-video-studio/scripts/qa_summary.py QA.json 汇总检查状态；它只验证已填记录，缺维度保持pending，不产生用户批准或客观质量分。
 
 资料型视频还需按 [编辑衔接](../cartoon-video-studio/references/editorial.md) 对照 EDITORIAL.json 检查最终MP4：是否遗漏入选发现、是否只展示未解释、证据与台词是否匹配、开头承诺是否兑现。观察绑定最终文件哈希；重渲染后旧检查不能沿用为通过。editorial_check.py仅校验记录，不自动证明质量。
+
+渲染前的视觉抽样应覆盖实际使用的不同版式和叠层组合，不仅取固定数量的等距缩略图。标签、说明、字幕在独立轨时，要放大检查交叠区；自动layout零错误仍可能遗漏跨层遮挡。返修后重查涉及的版式，并在最终MP4确认。
