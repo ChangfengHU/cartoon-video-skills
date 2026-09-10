@@ -1,7 +1,7 @@
 # Private cartoon asset MCP
 
-Eight tools: `library_info`, `asset_search`, `asset_get`, `asset_register`,
-`asset_feedback`, `asset_feedback_list`, `project_freeze`, `project_get`.
+Nine tools (v1.1): `library_info`, `asset_search`, `asset_get`, `asset_register`,
+`asset_revise`, `asset_feedback`, `asset_feedback_list`, `project_freeze`, `project_get`.
 The Skill makes videos; this service manages reusable assets and evidence only.
 
 Cloudflare Workers + an R2 binding; no CF administration token at runtime and no
@@ -54,3 +54,9 @@ owner, change both the bucket binding and the configured custom hostname.
 SDKs pinned in package-lock.json. Protocol is the official stateless MCP SDK v2
 handler with legacy-client compatibility. Secrets and request-body logging are
 not enabled. See repository VALIDATION.md for actual production checks.
+
+## v1.1 revisions and filtering
+
+Search adds tags_all, character_id, license_status, archive_allowed and bpm_min/max. Filters apply per page, not to a globally sorted result. All accesses remain inside the authenticated prefix. Character associations do not grant new tenant/brand access.
+
+asset_revise(id,patch,reason) creates a content-addressed successor preserving the original source, rights and media reference. Old IDs remain usable by frozen projects. Lifecycle retired is metadata, not revocation or deletion. Concurrent revisions can fork; consumers must inspect supersedes, not assume hash order is chronology. Revert by selecting the prior ID. No D1 migration or principal widening in this release.

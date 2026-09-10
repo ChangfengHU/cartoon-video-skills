@@ -94,3 +94,22 @@ test('freeze rejects truthy objects and string-as-platform/research arrays',asyn
     const input=structuredClone(base); Object.assign(input.new_music_research,patch); await assert.rejects(()=>l.freeze(input));
   }
 });
+test('structured filters require all tags and keep unknown BPM out of ranges',async()=>{
+ const l=setup({...principal,legacy_prefix:undefined});
+ await l.register({...card,tags:['喜剧','反转'],character_ids:['hongyi'],technical:{bpm:94}});
+ await l.register({...card,title:'unknown',tags:['喜剧'],character_ids:['xiaban']});
+ assert.equal((await l.search({tags_all:['喜剧','反转'],character_id:'hongyi',bpm_min:90,bpm_max:100,archive_allowed:true})).assets.length,1);
+ assert.equal((await l.search({tags_all:['反转'],character_id:'xiaban'})).assets.length,0);
+ assert.equal((await l.search({bpm_min:1})).assets.length,1);
+ await assert.rejects(()=>l.search({bpm_min:100,bpm_max:90}));
+});
+test('revision preserves original media and rights; identical retry deduplicates',async()=>{
+ const l=setup(); const a=await l.register(card,{bytes:new Uint8Array([1,2,3]),extension:'.wav'});
+ const b=await l.revise(a.id,{tags:['收尾'],lifecycle:'retired'},'no longer default');
+ assert.equal((await l.revise(a.id,{tags:['收尾'],lifecycle:'retired'},'no longer default')).id,b.id);
+ assert.deepEqual((await l.get(a.id)).asset.tags,['通知']);assert.deepEqual(b.record.object,a.record.object);
+ assert.equal(await sha(await (await l.file(b.id)).arrayBuffer()),a.record.object.sha256);
+ await assert.rejects(()=>l.revise(a.id,{license:{status:'approved'}},'invalid'));
+ const other=setup({...principal,prefix:'other/v2',legacy_prefix:undefined},l.bucket);
+ await assert.rejects(()=>other.revise(a.id,{tags:['leak']},'invalid'),{status:404});
+});

@@ -104,10 +104,13 @@ export class Library {
     }));
     return {rows, next_cursor: next ? btoa(JSON.stringify(next)) : null};
   }
-  async search({query = '', kind, cursor, limit = 40} = {}) {
+  async search({query = '', kind, cursor, limit = 40, tags_all = [], character_id, license_status, archive_allowed, bpm_min, bpm_max} = {}) {
+    assert(Array.isArray(tags_all) && tags_all.length <= 20 && tags_all.every(t => typeof t === 'string'), 'Invalid tags filter');
+    assert(bpm_min === undefined || Number.isFinite(bpm_min), 'Invalid BPM'); assert(bpm_max === undefined || Number.isFinite(bpm_max), 'Invalid BPM');
+    assert(bpm_min === undefined || bpm_max === undefined || bpm_min <= bpm_max, 'Invalid BPM range');
     const {rows, next_cursor} = await this.page('records', cursor, limit);
     const words = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
-    return {assets: rows.filter(r => (!kind || kind === r.kind) && words.every(w => JSON.stringify([r.title,r.tags,r.use_cases]).toLowerCase().includes(w))), next_cursor, scanned: rows.length, note:'Page-scoped keyword search; follow next_cursor even if this page has no matches. Registration is not individual approval.'};
+    return {assets: rows.filter(r => (!kind || kind === r.kind) && tags_all.every(t => (r.tags || []).includes(t)) && (!character_id || (r.character_ids || []).includes(character_id)) && (!license_status || r.license?.status === license_status) && (archive_allowed === undefined || r.license?.archive_allowed === archive_allowed) && (bpm_min === undefined || (Number.isFinite(r.technical?.bpm) && r.technical.bpm >= bpm_min)) && (bpm_max === undefined || (Number.isFinite(r.technical?.bpm) && r.technical.bpm <= bpm_max)) && words.every(w => JSON.stringify([r.title,r.tags,r.use_cases]).toLowerCase().includes(w))), next_cursor, scanned: rows.length, note:'Page-scoped keyword search; follow next_cursor even if this page has no matches. Registration is not individual approval.'};
   }
   async get(id) {
     const asset = await this.load('records', id);
@@ -137,6 +140,19 @@ export class Library {
     // R2 object upload time supplies audit time without perturbing identity.
     const record = {...card, object};
     return {...await this.append('records', record), record};
+  }
+  async revise(id, patch, reason) {
+    this.writeAllowed(); clean(patch);
+    assert(typeof reason === 'string' && reason.trim(), 'Revision reason required');
+    const allowed = ['title','tags','use_cases','avoid_use_cases','character_ids','technical','audition','review_status','lifecycle'];
+    assert(patch && Object.keys(patch).length && Object.keys(patch).every(k => allowed.includes(k)), 'Revision cannot change identity, file, source or rights');
+    if (patch.lifecycle) assert(['active','retired'].includes(patch.lifecycle), 'Invalid lifecycle');
+    if (patch.character_ids) assert(stringArray(patch.character_ids), 'Invalid character ids');
+    const previous = await this.load('records',id);
+    const {id: ignored, object, created_at, ...card} = previous;
+    const next = {...card,...patch,supersedes:id,revision_reason:reason};
+    validateCard(next);
+    return {...await this.append('records',{...next,object}),record:{...next,object},note:'Append-only revision; old ID and frozen projects remain valid. Branches are possible; no automatic latest-version approval.'};
   }
   async feedback(value) {
     this.writeAllowed(); clean(value);
