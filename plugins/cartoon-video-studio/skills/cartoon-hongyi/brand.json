@@ -1,0 +1,26 @@
+{
+  "brand_id": "cartoon-hongyi-v1",
+  "approval": "user overall satisfied with 202.634s full version; new edits require new QA",
+  "voice": {
+    "speaker": "zh_female_vv_uranus_bigtts",
+    "resource_id": "seed-tts-2.0",
+    "clone": false
+  },
+  "assets": [
+    {
+      "path": "assets/heroine-sheet-v1.png",
+      "sha256": "057031d36e9cac6bce2ffc50ca1deecb25a8d3be5af51f6612308db6d74bd3ad",
+      "source": "reference-conditioned generated cartoon; user overall satisfied with full video"
+    },
+    {
+      "path": "assets/heroine-sheet-v2.png",
+      "sha256": "dabd079e03ed2697b615855884cb341926935f676efd4ad2f77f9bb8375dc8ab",
+      "source": "reference-conditioned generated cartoon; user overall satisfied with full video"
+    },
+    {
+      "path": "assets/scenes-v2.png",
+      "sha256": "62a04854d816fd5d77cdf9e5fe07d5e9956221ed01b39a9ca5d409de337703c7",
+      "source": "reference-conditioned generated cartoon; user overall satisfied with full video"
+    }
+  ]
+}

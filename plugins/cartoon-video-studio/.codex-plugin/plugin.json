@@ -1,19 +1,25 @@
 {
   "name": "cartoon-video-studio",
-  "version": "0.1.0",
-  "description": "下班小人视频创作 Skill + 私有素材管理 MCP。配乐每片重新研究，素材跨会话积累。",
+  "version": "0.2.0",
+  "description": "多角色卡通视频工作室：独立角色品牌，共用HyperFrames制作、配音、质检与发布。",
   "author": {
     "name": "ChangfengHU"
   },
   "skills": "./skills/",
   "interface": {
-    "displayName": "下班小人视频工作室",
-    "shortDescription": "Skill 创作视频，MCP 管理私有素材",
-    "longDescription": "保持角色、手绘风格与喜剧表演标准，通过已授权素材服务积累图片、音效、配乐来源与作品反馈。渲染、图像和配音服务需运行环境另行提供。",
+    "displayName": "卡通视频工作室",
+    "shortDescription": "多角色品牌 · 共用制作 · 授权发布",
+    "longDescription": "包含工作室统一入口、下班小人和红衣侧辫女生，以及HyperFrames制作skills；可注册更多独立角色。远端素材、生图、转写和抖音发布需分别授权，本地运行时另行安装。",
     "developerName": "ChangfengHU",
     "category": "Productivity",
-    "capabilities": ["Read", "Write"],
-    "defaultPrompt": ["使用下班小人做一个约90秒的有趣故事，先查素材库，同时研究新的场景配乐。"],
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "使用卡通视频工作室，选择合适角色制作一部生活反转喜剧。",
+      "将这套新形象注册为独立角色，并保留原有角色。"
+    ],
     "websiteURL": "https://github.com/ChangfengHU/cartoon-video-skills",
     "brandColor": "#E7D9B9"
   },

@@ -1,67 +1,53 @@
-# Cartoon Video Skills
+# 卡通视频工作室
 
-可复用的卡通角色品牌skill仓库。当前版本为 **cartoon-xiaban（下班小人）v0.5.0**；安装包地址与哈希见 RELEASE.md。
+`cartoon-video-studio` 0.2.0：一个插件，多套独立角色，共用制作能力。原“下班小人视频工作室”保留安装ID，中文名称升级为卡通视频工作室。
 
-每个角色单独一个skill，隔离形象、声音候选和音乐偏好。当前包保留三根头发圆头角色、暖纸手绘画风、实际成片六姿态图集、表演示例代码、喜剧写作与配乐研究规则。
+## 内容
 
-![下班小人表演图集](skills/cartoon-xiaban/assets/identity/acting-sheet-v2.png)
+- 工作室入口：cartoon-video-studio；选择角色、冻结工程、组织制作与授权发布。
+- 角色：cartoon-xiaban（三根头发的下班小人）、cartoon-hongyi（红衣侧辫女生）。各有素材、声线、动作与认可参考，后续角色可独立加入。
+- 共用10个skills：hyperframes、general-video、hyperframes-core、hyperframes-cli、hyperframes-animation、hyperframes-keyframes、hyperframes-creative、hyperframes-audio、hyperframes-registry、media-use。
+- 4个HTTP MCP声明：vyibc-cartoon-assets、vyibc-image、vyibc-douyin、vyibc-youtube。分别负责素材、生图、授权发布、音频转写等；当前工具能力以服务返回为准。
 
-## 安装与使用
+角色、视觉风格和故事形式独立。两名现有角色均属暖纸手绘，不表示工作室只能做办公室或情感独白。
 
-已发布，安装命令和包哈希见[RELEASE.md](RELEASE.md)。安装到Codex后可说：
-
-> 使用 $cartoon-xiaban，以“AI替我省的时间去哪了”为题，制作约90秒手绘卡通视频，台词和表情要有情绪，按剧情重新找配乐，画面不放解释性页脚。
-
-Codex 的实体安装目录为 `~/.codex/skills/cartoon-xiaban`，安装脚本同时创建 `~/.agents/skills/cartoon-xiaban` 符号链接供用户级发现，只有一份实体文件。已有同名版本先移入隐藏备份目录；发现目录发生独立安装冲突时停止并保留两边。安装后下一轮可用，若未刷新请重启 Codex。
-
-或将仓库的skills/cartoon-xiaban目录安装到目标工具的skills目录。检查：
+## 安装与更新
 
 ```sh
-python3 skills/cartoon-xiaban/scripts/prepare_project.py --check-only
-python3 skills/cartoon-xiaban/scripts/test_prepare_project.py
-python3 skills/cartoon-xiaban/scripts/test_plan_music.py
-```
-
-固定故事的可执行演示见skill内references/acting-recipe.md。它需要调用者提供音频、字体、GSAP与可选音效；不是下载即带TTS模型的视频生成产品。
-
-## 当前状态
-
-- 形象、画风和动画方向获认可，内容趣味仍须提升。
-- 配音未定稿；不附带任何真人参考声音或合成本人音轨。
-- 配音后端可替换：已授权云 TTS、可用的 Mac mini、已验证 Linux 后端；跨机器可用私有 R2/SSH 传输。模型安装不作为成片前置条件，具体路由与失败处理见 skill 的 voice-routing.md。
-- BGM按故事重新研究，再按场景意图选择；不绑定固定歌曲。附带可测试的元数据排序辅助脚本，不冒充自动听音、音乐搜索服务或通用纯BGM提取器。
-- 默认约90秒，三层声音设计，说明性页脚关闭；需要署名的音乐在随片发布说明保留署名。另有九姿态候选，未覆盖已认可的六姿态。
-- v0.5 将素材管理封装为 `vyibc-cartoon-assets` MCP，服务端绑定私有 R2，支持旧记录读取、新素材去重、反馈和跨会话项目快照。每片仍先分析剧情，再主动寻找新配乐、核验使用范围并试听；旧库不决定默认歌曲。
-- R2 客户端使用 Python 标准库；渲染、TTS 和媒体服务是独立运行依赖。安装器不会安装模型、替换系统运行时或配置云端密钥。公共包只含客户端、文档与非敏感示例，实际素材和私有索引不进仓库。
-- 不包含密钥、Cookie、私人行为、云端权限、模型权重、第三方音乐与字体。公开包不授予这些外部素材的使用权。
-
-角色图由AI辅助创作，未做商标或全球相似性清查，不承诺独占。发布用于保存/安装此skill，不默示第三方音乐、模型或字体具有同样许可。未另行指定通用开源许可证。
-
-打包与安装命令使用[ChangfengHU/skill-publisher](https://github.com/ChangfengHU/skill-publisher)，发布记录说明所用修订和本地安全调整。
-
-## Skill + MCP 组合
-
-- Skill：编剧、分镜、表演、配乐判断和成片质检。
-- MCP：私有素材检索、入库、反馈、选择冻结；不生成视频，不自动升级品牌默认。
-- Plugin：`plugins/cartoon-video-studio` 将两者打包，Codex 使用相对 cwd 启动无第三方 Python 依赖的 stdio → HTTPS 转接器。渲染/图像/TTS 服务仍由运行环境提供。
-
-单独安装 Skill 后，可运行仓库的 `python3 install-asset-mcp.py` 添加 MCP。在隐藏提示中运行 `python3 ~/.codex/skills/cartoon-xiaban/scripts/asset_mcp.py configure` 配置管理员提供的**专用素材凭据**；不需要 Cloudflare 管理 Key。公开包不会自动获得主人素材库权限。
-
-或直接安装 Codex 组合插件（二选一，避免重复 MCP / Skill）：
-
-```bash
 codex plugin marketplace add ChangfengHU/cartoon-video-skills
 codex plugin add cartoon-video-studio@personal
 ```
 
-如果本机已经有同名 `personal` marketplace，先检查冲突，不覆盖已有来源；独立 Skill + MCP 路径仍可用。插件安装后用环境变量 `CARTOON_ASSETS_TOKEN`，或插件内 `asset_mcp.py configure` 绑定本用户的专用凭据。
+保留现有personal marketplace来源；如果有同名冲突，先核对来源，不能覆盖其他人的市场。已有安装需刷新该GitHub来源并重新安装插件，随后新线程读取新版skills。Fleet能力广场展示固定源码快照，不代表客户端自动升级。
 
-服务源代码与限制：[services/assets-mcp/README.md](services/assets-mcp/README.md)。素材管理客户端支持 Python3.9+ 的 Mac、Linux ARM/AMD；不宣称附带的全部外部视频引擎和语音模型均跨架构通用。
+Codex插件结构已校验；Claude客户端安装未验证。二进制环境另需Node22+、FFmpeg、Python3、Chromium、项目内HyperFrames。包内提供指令，不捆绑这些二进制、模型、用户凭据或豆包付费额度。
 
-运行时还需允许下载 helper 发 HTTPS 请求。Codex 的 MCP 连接正常，不表示
-命令执行沙箱也允许联网；若沙箱禁网，先获得该任务所需网络权限再下载，不要
-更换令牌、开放 R2 公网或声称素材已冻结。此仓库不会修改全局沙箱策略。
+## 授权
 
-正式 MCP 地址：`https://cartoon-assets-mcp.vyibc.com/mcp`。
-v0.5客户端中的 workers.dev 地址继续兼容，不必重新配置已正常工作的187；
-Fleet 等其他 Cloudflare Worker 使用正式域名做服务间调用。
+MCP使用客户端环境变量：CARTOON_ASSETS_TOKEN、VYIBC_IMAGE_TOKEN、VYIBC_DOUYIN_TOKEN、VYIBC_YOUTUBE_TOKEN；豆包为DOUBAO_API_KEY。安装不会获取机主账号权限，不在公开JSON内粘贴Key。同端点已有连接优先复用。
+
+资产服务0.1插件原有stdio桥接脚本保留供独立调用；0.2插件改用同一官方HTTP端点及客户端环境授权，避免对角色目录中的Python桥接路径形成依赖。只在需要时连接相关服务。
+
+## 扩展角色
+
+将完整角色skill交给 `skills/cartoon-video-studio/scripts/register_character.py`，按其 `--help` 提供唯一id、显示名和相对品牌JSON路径。脚本验证素材哈希、目录安全和冲突，再注册目录。随后运行：
+
+```sh
+python3 scripts/sync-plugin.py
+python3 scripts/validate-studio.py
+python3 -m unittest discover -s tests
+```
+
+canonical来源在skills/，插件skills/由脚本镜像；不手工维护两套不同版本。更新插件版本后发布GitHub，并更新Fleet固定快照，不为每个形象重复部署MCP。
+
+## 发布原则
+
+发布文案聚焦剧情、互动、话题；优先使用无需公开署名的授权音乐。已有曲目要求署名时不能擅删，先换曲或履行许可。AI和虚构声明按内容保留。用户明确授权才发布，R2交付和安装插件本身不等于公开发布授权。
+
+抖音MCP自定义封面目前实验性，实际遇到失败；话题仅保证文案文本。失败/不确定/正式回执分别记录，不能盲目重投。详情在工作室发布规范。
+
+## 回滚与范围
+
+0.1.0源码快照为12a9206e5b1959a1adc5d4e7147829e9968057fa。需要回滚时将市场来源固定到该提交并重新安装；不要删除作品目录或账号凭据。卸载只通过客户端移除cartoon-video-studio插件，独立安装的同名skills不自动删除。
+
+本次验证插件镜像、目录扩展/冲突/哈希、公开结构及Hub展示；未为验证而再生成视频、付费生图或发布旧作品。HyperFrames第三方许可见plugins/cartoon-video-studio/THIRD-PARTY.md。

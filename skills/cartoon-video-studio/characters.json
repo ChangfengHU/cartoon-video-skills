@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "characters": [
+    {
+      "id": "xiaban",
+      "name": "下班小人",
+      "skill": "cartoon-xiaban",
+      "brandFile": "assets/brand.json",
+      "visualStyle": "warm-paper-ink",
+      "storyForms": [
+        "生活喜剧",
+        "办公室喜剧"
+      ],
+      "approval": "original approved video reference in own brand package"
+    },
+    {
+      "id": "hongyi",
+      "name": "红衣侧辫女生",
+      "skill": "cartoon-hongyi",
+      "brandFile": "brand.json",
+      "visualStyle": "warm-paper-ink",
+      "storyForms": [
+        "女性独白",
+        "生活喜剧",
+        "反转故事"
+      ],
+      "approval": "user overall satisfied with full reference; later versions require QA"
+    }
+  ]
+}

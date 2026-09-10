@@ -1,3 +1,13 @@
+# cartoon-video-studio 0.2.0 — 多角色工作室
+
+保留插件ID，升级中文名为卡通视频工作室。包含13个skills、2个独立角色和4个HTTP MCP声明；新增形象注册、品牌隔离、共用HyperFrames指令、运行环境检查和发布规范。安装命令及授权方式见README。
+
+本版不更新旧的独立cartoon-xiaban ZIP安装器；那个安装器仍为0.5.0单角色发布。新工作室从GitHub插件安装，不能将两种发布渠道混为同一版本。HyperFrames二进制和服务授权不捆绑。
+
+验证：插件manifest校验、426个共享文件哈希、canonical/plugin镜像、角色注册成功/冲突/坏哈希/越界路径检查。桌面客户端重新安装及新角色实际生图成片不在本版验证范围；Fleet上线证据另见发布记录。
+
+---
+
 # cartoon-xiaban v0.5.0
 
 Published using [ChangfengHU/skill-publisher](https://github.com/ChangfengHU/skill-publisher).

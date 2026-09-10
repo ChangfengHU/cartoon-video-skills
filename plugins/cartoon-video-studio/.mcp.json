@@ -1,12 +1,20 @@
 {
   "mcpServers": {
     "vyibc-cartoon-assets": {
-      "command": "python3",
-      "args": ["skills/cartoon-xiaban/scripts/asset_mcp.py", "stdio"],
-      "cwd": ".",
-      "env_vars": ["CARTOON_ASSETS_TOKEN", "CARTOON_ASSETS_MCP_URL"],
-      "startup_timeout_sec": 30,
-      "tool_timeout_sec": 90
+      "url": "https://cartoon-assets-mcp.vyibc.com/mcp",
+      "bearer_token_env_var": "CARTOON_ASSETS_TOKEN"
+    },
+    "vyibc-image": {
+      "url": "https://fleet.vyibc.com/mcp/image",
+      "bearer_token_env_var": "VYIBC_IMAGE_TOKEN"
+    },
+    "vyibc-douyin": {
+      "url": "https://fleet.vyibc.com/mcp/douyin",
+      "bearer_token_env_var": "VYIBC_DOUYIN_TOKEN"
+    },
+    "vyibc-youtube": {
+      "url": "https://youtube-mcp.vyibc.com/mcp",
+      "bearer_token_env_var": "VYIBC_YOUTUBE_TOKEN"
     }
   }
 }
