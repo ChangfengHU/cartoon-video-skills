@@ -33,7 +33,11 @@ def validate(data, root, stage='plan'):
         path = (root / name).resolve()
         return path if path.is_relative_to(root) and path.is_file() else None
     if not isinstance(data, dict): return {'errors':['object_required'], 'pending':[], 'record_status':'invalid', 'quality_approved':False}
-    need(data.get('schema_version') == 1, 'schema_version')
+    need(data.get('schema_version') in [1,2], 'schema_version')
+    v2 = data.get('schema_version') == 2
+    if v2:
+        intent = data.get('intent')
+        need(isinstance(intent,dict) and all(nonempty(intent.get(k)) for k in ['audience','assumed_knowledge','promise']), 'intent_required')
     need(nonempty(data.get('topic')), 'topic_required')
     style = data.get('style', {})
     need(isinstance(style, dict) and all(nonempty(style.get(k)) for k in ['name','reason']), 'style_reason_required')
@@ -49,8 +53,23 @@ def validate(data, root, stage='plan'):
         if f.get('kind') in ['fact','observation']: need(bool(rr), fid + ':evidence_required')
         need(f.get('decision') in ['include','omit','defer'], fid + ':decision')
         if f.get('decision') == 'include': selected.add(fid)
+    if v2:
+        focus = []
+        for fid in selected:
+            f = findings[fid]; c = f.get('contribution')
+            ok = isinstance(c,dict) and c.get('role') in ['focus','context'] and all(nonempty(c.get(k)) for k in ['known','adds'])
+            need(ok, fid + ':contribution_required')
+            if ok and c['role'] == 'focus': focus.append(fid)
+        need(bool(focus), 'focus_required')
+        for fid,f in findings.items():
+            if 'comparison' in f:
+                c=f['comparison']
+                if need(isinstance(c,dict) and nonempty(c.get('baseline')), fid + ':comparison_baseline_required'):
+                    rr=refs(c.get('source_ids'),sources,fid+':comparison')
+                    need(bool(rr),fid+':comparison_evidence_required')
     covered = set()
     for bid, b in beats.items():
+        if v2: need(nonempty(b.get('loss_if_removed')), bid + ':removal_review_required')
         rr = refs(b.get('finding_ids'), findings, bid)
         need(bool(rr), bid + ':finding_required')
         need(all(x in selected for x in rr), bid + ':unselected_finding')

@@ -35,4 +35,20 @@ class Editorial(unittest.TestCase):
  def test_malformed_inputs(self):
   for key,value in [('sources',None),('beats',[None]),('style',None),('findings',None)]:
    d=copy.deepcopy(self.data);d[key]=value;self.assertTrue(m.validate(d,self.root)['errors'])
+class EditorialV2(Editorial):
+ def setUp(self):
+  super().setUp();self.data['schema_version']=2
+  self.data['intent']={'audience':'夜班乘客','assumed_knowledge':'知道旧末班时间','promise':'理解哪些晚班现在可以坐公交'}
+  self.data['findings'][0]['contribution']={'role':'focus','known':'旧时间','adds':'公告新增覆盖时段'}
+  self.data['beats'][0]['loss_if_removed']='不知道新增班次适用范围'
+ def test_missing_promise(self):
+  self.data['intent'].pop('promise');self.assertIn('intent_required',self.check()['errors'])
+ def test_context_cannot_be_only_focus(self):
+  self.data['findings'][0]['contribution']['role']='context';self.assertIn('focus_required',self.check()['errors'])
+ def test_comparison_needs_evidence(self):
+  self.data['findings'][0]['comparison']={'baseline':'旧公告','source_ids':[]}
+  self.assertIn('route:comparison_evidence_required',self.check()['errors'])
+ def test_no_comparison_required(self):self.assertFalse(self.check()['errors'])
+ def test_removal_review(self):
+  self.data['beats'][0].pop('loss_if_removed');self.assertIn('explain:removal_review_required',self.check()['errors'])
 if __name__=='__main__': unittest.main()
