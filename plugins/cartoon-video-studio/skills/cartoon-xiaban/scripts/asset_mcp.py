@@ -79,7 +79,8 @@ class Client:
         if not raw:
             return None
         if 'text/event-stream' in headers.get('Content-Type', ''):
-            payloads = [line[6:] for line in raw.decode().splitlines() if line.startswith('data: ')]
+            payloads = ['\n'.join(line[5:].lstrip(' ') for line in event.split('\n') if line.startswith('data:')) for event in raw.decode('utf-8').replace('\r\n','\n').split('\n\n')]
+            payloads = [p for p in payloads if p]
             values = [json.loads(x) for x in payloads]
             reply = next((x for x in values if x.get('id') == message.get('id')), None)
         else:
