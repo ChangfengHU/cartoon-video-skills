@@ -14,6 +14,8 @@ class Production(unittest.TestCase):
   run=self.start();self.call('remote','voice',run_id=run,provider='test',job='job1');self.call('fail','voice',run_id=run,reason='timeout')
   with self.assertRaises(ValueError):self.call('begin','voice')
   self.call('remote','voice',run_id=run,provider='test',job='job1',remote_status='failed');self.assertNotEqual(self.call('begin','voice')['run_id'],run)
+ def test_recovered_success_finishes_original_attempt(self):
+  run=self.start();self.call('remote','voice',run_id=run,provider='test',job='job1');self.call('fail','voice',run_id=run,reason='network timeout');self.call('remote','voice',run_id=run,provider='test',job='job1',remote_status='succeeded');self.call('finish','voice',run_id=run,outputs=['out.wav']);self.assertTrue(self.call('status')['voice']['reusable'])
  def test_wrong_attempt_and_escape_do_not_finish(self):
   run=self.start()
   with self.assertRaises(ValueError):self.call('finish','voice',run_id='wrong',outputs=['out.wav'])

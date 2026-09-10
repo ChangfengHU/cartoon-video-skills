@@ -17,3 +17,11 @@ for n,digest in lock['files'].items():assert hashlib.sha256((pkg/'skills'/n).rea
 m=json.loads((pkg/'.mcp.json').read_text());assert len(m['mcpServers'])==4
 for n,c in m['mcpServers'].items():assert c['url'].startswith('https://') and c.get('bearer_token_env_var') and 'headers' not in c
 print(json.dumps({'skills':len(names),'characters':len(ids),'mcp':len(m['mcpServers']),'mirrors':'identical','upstream_files':len(lock['files'])}))
+
+for c in registry['characters']:
+ profile=json.loads((skills/c['skill']/c['profileFile']).read_text())
+ assert profile['id']==c['id'] and profile['profile_version']>=1
+ for k in ['introduction','personality','speaking_style','suitable_scenes','casting_roles','editorial_status']:assert profile.get(k),k
+cl=json.loads((pkg/'character-design.lock.json').read_text())
+for name,digest in cl['files'].items():assert hashlib.sha256((pkg/'skills/vyibc-character-design'/name).read_bytes()).hexdigest()==digest
+print('Character profiles and imported designer bytes verified')

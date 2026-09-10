@@ -106,3 +106,16 @@ Validated on 2026-09-07. This release preserves the v0.3.3 creative requirements
 These checks validate package integrity, client behavior, installation and history recovery. They do not guarantee the same perceived quality for every new video, natural voice performance, music rights, successful cloud calls without credentials, or performance on an unconfigured machine. No new creative video run is part of this release validation.
 
 The earlier v0.2.0 fixed-story demonstration had zero lint/runtime/layout errors and 27/27 contrast checks, with four repeated-sprite and six intentional crop/edge warnings. Those are historical results for that demonstration; they are not new v0.4.0 render results.
+
+
+## Studio 0.3 / asset service 1.1 — 2026-09-10
+
+- 15 Python tests: character registration, task invalidation, original cloud-job recovery, input/output changes, scoped paths, quality-state separation and Unicode SSE decoding.
+- 14 asset-service tests: existing tenant isolation/rights/legacy records, additional structured filters and immutable revisions preserving media/rights.
+- 11 imported character-design tests; 17 skills mirror exactly, both character profiles and frozen design component verified. No new image/voice/video generation in this software release; new-story aesthetic stability remains untested.
+- Live asset MCP: 9 tools, filtered existing Investigations track; revision e6b3fe917fde432be5c95d740f5f154332268201e0cfe992ca31244252ceef34 adds hongyi association. Original b4353c01eab26bc044b52f282cc9ba31700bd0affd055f170e106f233b133239 remains unchanged; rights/object preserved. Friendly and workers.dev health200, unauthenticated401, authenticated tools/list200.
+- Deployment8252f2f9-78a5-43bc-b3a6-796da3a7d6ce replaces3efc313d-89fc-4272-b374-f44c6090e0f2. The initial exact /settings comparison failed after upload; its old transient response was not retained, cause not established. Independent version-resource comparison proves bindings and script_runtime identical; only script changed. Complete code readback matched. SDK bootstrap in live prefix preserved.
+- Old Python SSE splitter failed on Unicode line separators embedded in JSON strings. Bundled client now splits only real SSE LF lines/events and has regression coverage.
+- Catalog remains R2 within existing authenticated scope. No D1 index, global usage sorting, principal broadening or automatic background media-health scan. Revisions can fork; retirement does not revoke old frozen selections.
+- Task ledger is local orchestration evidence, not a daemon. Agent executes external work. The submission-to-ID-recording crash window is not exactly-once. Stored pass statements do not prove actual listening/viewing or user approval.
+- Rollback: restore a Git commit for plugin source; restore the previous Worker code/version only after checking later deployments. Keep R2 records and authentication bindings. Re-select prior immutable asset ID rather than deleting corrections. Install updates do not prove a running client hot-reloaded.

@@ -78,6 +78,7 @@ def operate(root,action,key=None,**opts):
                     rs=opts.get('remote_status','unknown')
                     if rs not in ['unknown','running','succeeded','failed','cancelled']:raise ValueError('Invalid remote status')
                     t.update(remote_job={'provider':provider,'id':job},remote_status=rs)
+                    if rs=='succeeded' and t['status']=='failed':t['status']='running'
                 elif action=='finish':
                     if t.get('remote_job') and t.get('remote_status')!='succeeded':raise ValueError('Remote result not confirmed successful')
                     if any(stale(root,tasks,d) or t['dependency_runs'][d]!=tasks[d]['run_id'] for d in t['deps']):raise ValueError('Dependencies changed during task')
