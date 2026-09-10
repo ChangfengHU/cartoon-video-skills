@@ -25,7 +25,15 @@ def register(studio,source,identity,name,brand_file):
   file=(source/a['path']).resolve()
   if not file.is_relative_to(source) or not file.is_file():raise ValueError('Asset outside source or missing')
   if hashlib.sha256(file.read_bytes()).hexdigest()!=a['sha256']:raise ValueError('Asset hash mismatch')
+ profile=source/'character-profile.json'
+ profile_data=None
+ if profile.exists():
+  profile_data=json.loads(profile.read_text())
+  required=['introduction','personality','speaking_style','emotional_range','suitable_scenes','casting_roles','comedy_engine','boundaries','editorial_status','profile_version']
+  if profile_data.get('id')!=identity or any(not profile_data.get(k) for k in required):raise ValueError('Incomplete character profile or mismatched id')
  rows.append({'id':identity,'name':name,'skill':skill,'brandFile':brand_file,'approval':brand.get('approval','candidate; no user approval recorded')})
+ if profile_data:rows[-1]['profileFile']='character-profile.json'
+ else:rows[-1]['castingStatus']='candidate_missing_profile'
  stage=Path(tempfile.mkdtemp(prefix='.register-',dir=skills));moved=False
  try:
   shutil.copytree(source,stage/'bundle');(stage/'catalog.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n');os.replace(stage/'bundle',dest);moved=True;os.replace(stage/'catalog.json',catalog)

@@ -11,7 +11,8 @@
         "生活喜剧",
         "办公室喜剧"
       ],
-      "approval": "original approved video reference in own brand package"
+      "approval": "original approved video reference in own brand package",
+      "profileFile": "character-profile.json"
     },
     {
       "id": "hongyi",
@@ -24,7 +25,8 @@
         "生活喜剧",
         "反转故事"
       ],
-      "approval": "user overall satisfied with full reference; later versions require QA"
+      "approval": "user overall satisfied with full reference; later versions require QA",
+      "profileFile": "character-profile.json"
     }
   ]
 }

@@ -10,6 +10,13 @@ class RegistryTest(unittest.TestCase):
   mod.register(self.studio,self.src,'new','新角色','brand.json');before=(self.studio/'characters.json').read_bytes()
   with self.assertRaises(ValueError):mod.register(self.studio,self.src,'other','冲突','brand.json')
   self.assertEqual(before,(self.studio/'characters.json').read_bytes());self.assertTrue((self.root/'skills/cartoon-new/reference.png').exists())
+ def test_bad_profile_leaves_catalog_unchanged(self):
+  (self.src/'character-profile.json').write_text('{"id":"wrong"}')
+  with self.assertRaises(ValueError):mod.register(self.studio,self.src,'new','新','brand.json')
+  self.assertEqual(json.loads((self.studio/'characters.json').read_text()),{'characters':[]})
+ def test_missing_profile_is_not_cast_ready(self):
+  mod.register(self.studio,self.src,'new','新','brand.json')
+  self.assertEqual(json.loads((self.studio/'characters.json').read_text())['characters'][0]['castingStatus'],'candidate_missing_profile')
  def test_bad_hash_does_not_register(self):
   self.brand['assets'][0]['sha256']='wrong';self.save()
   with self.assertRaises(ValueError):mod.register(self.studio,self.src,'new','新','brand.json')

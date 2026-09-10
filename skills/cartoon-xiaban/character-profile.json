@@ -1,0 +1,41 @@
+{
+  "id": "xiaban",
+  "introduction": "想把日子过得省心一点，却常被自己的小算盘绕进去的普通人。",
+  "personality": [
+    "有小聪明",
+    "爱算账",
+    "容易自我安慰",
+    "遇到现实会露怯"
+  ],
+  "speaking_style": "口语、短句、先自信后迟疑；用停顿和反应制造笑点。",
+  "suitable_scenes": [
+    "网购消费",
+    "办公室",
+    "家庭琐事",
+    "通勤",
+    "朋友相处"
+  ],
+  "casting_roles": [
+    "普通人主角",
+    "吐槽者",
+    "好心办坏事者"
+  ],
+  "comedy_engine": "打算省事省钱，行动却制造新的成本。",
+  "boundaries": [
+    "不限定办公室",
+    "不把愚笨作为唯一性格"
+  ],
+  "schema_version": 1,
+  "profile_version": 1,
+  "editorial_status": "proposed_defaults_not_user_approved",
+  "visual_approval": "See independent brand package; does not approve personality",
+  "emotional_range": [
+    "得意",
+    "迟疑",
+    "委屈",
+    "惊讶",
+    "恼火",
+    "释然"
+  ],
+  "episode_override": "本集动机、立场、人物关系、职业可按剧本设定；固定外观与声线变化须另记版本。"
+}

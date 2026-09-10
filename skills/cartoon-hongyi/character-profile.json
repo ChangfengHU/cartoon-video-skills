@@ -1,0 +1,43 @@
+{
+  "id": "hongyi",
+  "introduction": "表达直接、情绪鲜明，擅长把生活中的委屈和小心思讲给观众听的成年女生。",
+  "personality": [
+    "表达欲强",
+    "反应快",
+    "在意自己的立场",
+    "可以嘴硬也可以真诚"
+  ],
+  "speaking_style": "面对镜头讲述，强调、反问、停顿与表情相配；快慢服务情绪。",
+  "suitable_scenes": [
+    "情感独白",
+    "家庭生活",
+    "消费选择",
+    "朋友争执",
+    "职场沟通"
+  ],
+  "casting_roles": [
+    "叙述者",
+    "反转喜剧主角",
+    "直率朋友",
+    "受委屈后反击者"
+  ],
+  "comedy_engine": "叙述的自信与画面揭示的事实形成反差。",
+  "boundaries": [
+    "房本是单集道具，不是必备身份",
+    "单集自利角色不等于永久反派性格",
+    "不把角色行为概括成女性群体特征"
+  ],
+  "schema_version": 1,
+  "profile_version": 1,
+  "editorial_status": "proposed_defaults_not_user_approved",
+  "visual_approval": "See independent brand package; does not approve personality",
+  "emotional_range": [
+    "得意",
+    "迟疑",
+    "委屈",
+    "惊讶",
+    "恼火",
+    "释然"
+  ],
+  "episode_override": "本集动机、立场、人物关系、职业可按剧本设定；固定外观与声线变化须另记版本。"
+}
