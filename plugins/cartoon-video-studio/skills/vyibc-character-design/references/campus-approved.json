@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "projectId": "campus-character",
+  "style": {
+    "id": "campus-soft-slump-3d",
+    "description": "柔和哑光三维动画；原创成年大学生；青春、灵动、清纯、碎发与微丧，不套用其他故事"
+  },
+  "characters": [
+    {
+      "id": "campus-girl",
+      "version": 1,
+      "name": "校园女主（暂未命名）",
+      "role": "protagonist",
+      "species": "human",
+      "age": 20,
+      "brief": "早八没睡醒但机灵可爱的成年大学生；保留已批准造型，剧情另定。",
+      "identityLocks": [
+        "柔和圆椭圆脸、自然鼻尖、深色杏眼、浅淡颊雀斑",
+        "深巧克力色松散低丸子头、浅薄荷抓夹、碎发",
+        "燕麦灰开衫、奶油圆领衫、浅灰粉宽松长裤、象牙白帆布鞋"
+      ],
+      "references": [
+        {
+          "url": "https://resource.vyibc.com/campus-ref-20260909-natural.webp",
+          "purpose": "自然脸部设计语言（不复制真人身份）"
+        },
+        {
+          "url": "https://resource.vyibc.com/campus-ref-20260909-expression.webp",
+          "purpose": "碎发与表情灵感"
+        },
+        {
+          "url": "https://resource.vyibc.com/campus-ref-20260909-outfit.webp",
+          "purpose": "宽松校园服装轮廓"
+        }
+      ],
+      "requiredAssets": [
+        "turnaround",
+        "expressions"
+      ],
+      "assets": [
+        {
+          "kind": "turnaround",
+          "url": "https://resource.vyibc.com/campus-character-v1-20260909-turnaround.png",
+          "sha256": "f6ffe5d444c41bc9d0ddb391d4ff591657c2dde0374f87e2f356634450f6677a",
+          "provider": "built-in imagegen",
+          "prompt": "Use case: stylized-concept.\nCreate a NEW ORIGINAL fictional Chinese ADULT 20-year-old female university student for an expressive 3D animated story. This is NOT a photograph, NOT an image of the real reference people. Reference 1 supplies soft natural cheek and brow design inspiration only; reference 2 supplies flyaway hair and cute spontaneous facial acting inspiration only; reference 3 supplies relaxed student clothing silhouette only. Invent a distinct original identity integrating those visual cues. Do NOT copy any reference person's identity.\nAsset: landscape professional character turnaround with exactly THREE equally sized FULL-BODY figures: straight FRONT, strict 90-degree SIDE facing right, and full BACK. All same scale, feet on common baseline, complete head and shoes visible. Off-white subtle paperlike seamless studio backdrop, no scenery or extra figures, small English FRONT / SIDE / BACK labels.\nArt direction: truly appealing stylized 3D animation with hand-designed softly sculpted facial planes, painterly-matte tactile materials, believable but simplified hair clumps and fine flyaways, readable animated face. Genuinely young adult campus girl, lovable, spontaneous, slightly scruffy and sleepy, yet pretty and full of potential mischief. NOT photorealism, NOT generic glossy Disney princess, NOT fashion editorial, NOT chibi toddler, NOT heavy gothic misery.\nFace: soft rounded oval with natural cheek volume, gently rounded chin, subtle asymmetric brows, medium-large dark hazel almond eyes with softly hooded upper lids; slightly sleepy half-relaxed look but clear lively gaze. Small natural nose with rounded tip, muted rosy lips slightly pursed as if unimpressed by an early lecture. NO pointy V chin, no high sharp nose, no huge glass marbles, no heavy eyeliner, no cosmetic glamour, no aging or deep eye bags. Distinct little faint freckle on one cheek, softly warm natural skin.\nHair: dark chocolate almost-black hair, loosely twisted into a messy low bun held by one small pale mint claw clip; wispy uneven curtain fringe, loose strands around ears, crown flyaways, one escaped neck wisp. Same bun and clip and fringe in all views. Not shiny perfectly curled long hair.\nBody: healthy natural slim young ADULT proportions around 7 heads tall, relaxed shoulders, a little slouch; no extreme waist or elongated model legs.\nClothes: soft oversized washed oatmeal-gray open cardigan with long sleeves bunching at wrists, plain cream crew-neck cotton T-shirt full length covering waist, loose pale dusty-pink drawstring lounge trousers with side pockets and soft rumples, worn-in ivory canvas low-top sneakers. Clothes clean but casually creased, not torn or filthy. No skirt, no suit, no tights, no heels, no jewelry.\nHer charisma is '清纯可爱、青春灵动、早八没睡醒、有点丧又有点皮、头发随便一扎但好看'. Neutral relaxed stance with hands visible by her sides, exactly same outfit, face, hairstyle and anatomy across front / side / back. Soft warm daylight studio lighting showing the materials. No mirror, phone, school badge, text paragraphs, extra face panels or watermark.",
+          "inputReferences": [
+            "https://resource.vyibc.com/campus-ref-20260909-natural.webp",
+            "https://resource.vyibc.com/campus-ref-20260909-expression.webp",
+            "https://resource.vyibc.com/campus-ref-20260909-outfit.webp"
+          ],
+          "views": [
+            "front",
+            "side",
+            "back"
+          ],
+          "technical": {
+            "status": "pass",
+            "evidence": "2026-09-09 生成；1536×1024 PNG；上传后远端完整字节与本地一致，2026-09-10 从保留原文件提取 SHA-256。"
+          },
+          "visual": {
+            "status": "pass",
+            "evidence": "原交付逐图检查：正侧背三视角、共同基线、完整全身；用户随后确认效果。"
+          }
+        },
+        {
+          "kind": "expressions",
+          "url": "https://resource.vyibc.com/campus-character-v1-20260909-expressions.png",
+          "sha256": "414c642813facd9696e65493a7de1a674fe7f5d92928056638a0f1e1ad9bdd4a",
+          "provider": "built-in imagegen",
+          "prompt": "Use case: identity-preserve.\nImage 1 is the exact character identity and rendering style reference. Create an ACTING EXPRESSION SHEET of the SAME fictional ADULT 20-year-old Chinese female university student. Do not change identity, age, soft rounded-oval face, natural nose, eye shape, warm matte skin, small cheek freckle, loose dark-chocolate low bun, pale mint claw clip, unruly fine curtain fringe, oatmeal-gray oversized cardigan or cream crewneck shirt.\nComposition: FOUR LARGE head-and-shoulders portraits in a clean 2x2 landscape grid, with clear breathing room and NO TEXT. Each portrait fills its quarter with full hair and shoulders visible. Off-white studio background. All rendered in exactly the reference's appealing softly sculpted stylized 3D animation style, not photos, not flat cartoons, not glossy plastic, not toddler chibi.\nEach panel depicts a clearly DIFFERENT real acting beat:\nTop left: '早八困倦' — slightly droopy upper eyelids, relaxed asymmetric mouth, chin tilted down a little, eyes still focused, cute mildly unimpressed sleepy look, no tears and no aging eye bags.\nTop right: '你认真的吗' — ONE eyebrow raised, the other lowered, an unmistakable sideways skeptical glance and lips pressing together in restrained disbelief. Head turned 15 degrees, not a flat identical stare.\nBottom left: '偷偷憋笑' — presses lips together with one corner curling, cheeks subtly lifted, eyes glancing off to side like she is about to break into a giggle; one cardigan-covered hand gently near mouth without concealing facial structure.\nBottom right: '真的开心' — spontaneous open smile showing a little upper teeth, eyes narrowing warmly, cheeks lifting, head tilting lightly, genuinely animated and lively, not an advertisement model smile.\nMake these four contrasting expressions visually readable at thumbnail size while keeping ONE exact original identity. Cute, pure, messy-haired youthful ADULT campus energy. No cleavage, no heavy cosmetics, no props or new jewelry. Neither horror nor romance scene. Preserve the physical face across different muscle movements, do not swap faces.",
+          "inputReferences": [
+            "https://resource.vyibc.com/campus-character-v1-20260909-turnaround.png"
+          ],
+          "expressions": [
+            "早八困倦",
+            "你认真的吗",
+            "偷偷憋笑",
+            "真的开心"
+          ],
+          "technical": {
+            "status": "pass",
+            "evidence": "2026-09-09 生成；1536×1024 PNG；上传后远端完整字节与本地一致，2026-09-10 从保留原文件提取 SHA-256。"
+          },
+          "visual": {
+            "status": "pass",
+            "evidence": "原交付逐图检查：四格表情有区别，脸型发型服装与三视图保持一致；用户随后确认效果。"
+          }
+        }
+      ],
+      "approval": {
+        "status": "approved",
+        "evidence": "2026-09-10 本会话用户：这是我想要的效果。批准形象与表情，不代表批准剧情或所有提供方。"
+      }
+    }
+  ],
+  "lineups": []
+}

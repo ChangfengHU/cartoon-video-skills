@@ -15,6 +15,12 @@ description: 卡通视频工作室统一入口，按需选择下班小人、红�
 
 角色、音乐、音效、姿势、场景、声线和动画组件均按 [素材管理](references/asset-management.md) 登记、检索及冻结。选角须读人物档案，不能只按外观或上次使用选人。音乐建议标签不等于听审通过，成片满意不等于逐项素材认可。
 
+## 制作路由
+
+用户思路/外部资料包 → [编导](../studio-director/SKILL.md) → 选已有角色或 [独立角色设计](../vyibc-character-design/SKILL.md) → [配乐](../studio-music/SKILL.md) → HyperFrames → [成片质检](../studio-quality/SKILL.md)。选题搜索与事实研究保持独立，仅用户需要时接入；不把研究设为制作的前置门槛。
+
+新增角色参考设计skill的cast清单，与本工作室brand/profile字段映射，避免两份身份真相；见 [制作任务恢复](references/production.md)。所有网络任务先保存返回ID再轮询，恢复时检查原任务；没有结果不等于没有提交。
+
 ## 共用制作能力
 
 视频从 [HyperFrames](../hyperframes/SKILL.md) 进入，复杂卡通执行 [general-video](../general-video/SKILL.md)。结构、动画、镜头、混音、CLI与media-use均随包提供；二进制运行环境、TTS账户和远端服务授权不随安装自动获得。

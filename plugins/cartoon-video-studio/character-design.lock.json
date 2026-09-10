@@ -1,0 +1,17 @@
+{
+  "repository": "ChangfengHU/linux-clash-skill",
+  "revision": "860cfe2a6afb78bc842535b136fb52fcb8598f61",
+  "path": "skills/vyibc-character-design",
+  "files": {
+    "SKILL.md": "2cfcb066c1a1561e82863dc9fcb18622010bc38653366e808afdbbd31e95e9b7",
+    "scripts/character-check.mjs": "d17f799414eb8a8965010f48684d3b88b0a61e0c66000138fc6e65e6098ab043",
+    "scripts/character-check.test.mjs": "984ff25265dec32ab33cb8002f89999b9e1e0446f90a9105284948796da41777",
+    "scripts/install.mjs": "e420032dcc0b0ed326510937713294064e6de6b4b7cd8fbf58fb06d91a8118f2",
+    "scripts/install.test.mjs": "0952a4dc68c57e643292e66a6c9a4e9b094e0087362b7b5eba5c26974e935874",
+    "references/campus-soft-slump.md": "cd9f015018ac0bb6f427984156255e5e2083967c5865d01c3d69f959b2aa1775",
+    "references/campus-approved.json": "1908227498c6133192ae4285911ccd506a7eaacfb9d97b19c6373d01e90690b8",
+    "references/asset-contract.md": "6eb7775d7cf82b6a90355b91c331ce03c2dc88e0a29099a2b4f5f4f6eaef44cc",
+    "references/providers.md": "4933dc50105fc1f28a32c6d2dadd098954e13d6d37d919068ac2aa9f4ba9b256",
+    "agents/openai.yaml": "39cb49c640265e1f321601646c4dc8fd0dacd548395b6b13c8b1166e095f686e"
+  }
+}

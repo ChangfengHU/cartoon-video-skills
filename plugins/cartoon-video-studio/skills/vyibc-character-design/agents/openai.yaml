@@ -1,0 +1,4 @@
+interface:
+  display_name: "角色设计工作室"
+  short_description: "从审美描述设计主配角、反派与拟人角色，生成三视图、表情和整组比例对照"
+  default_prompt: "使用 $vyibc-character-design，保留已定稿女主，为故事设计有辨识度且画风统一的配角，交付实际角色图片。"
