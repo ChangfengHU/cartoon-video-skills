@@ -5,6 +5,8 @@ description: 对工作室实际成片与连续动作进行质量检查，记录�
 
 # 成片质量与返修
 
+有锁定台词的配音必须执行 [配音完整性与返修](references/speech-integrity.md)：源配音与最终MP4各自做ASR差异检查，证据绑定当前文件哈希。漏词、错词或待解释差异不能靠技术通过抵消；使用 scripts/speech_check.py 执行内容检查。ASR一致仍不等于听审通过。
+
 从实际MP4取证，不只看HTML预览。使用 ../hyperframes/SKILL.md 路由CLI检查，按 ../cartoon-xiaban/references/quality-regression.md 对照用户指定参考片；新角色比较清晰度、表演和节奏，不要求长相相同。
 
 交付QA分开列：技术检查、视觉检查、听审、用户反馈。记录文件哈希、检查片段、连续帧采样时刻和证据路径。没检查填 pending；发现问题填 fail 和对应时间。用户认可只能引用真实原话，不由自动流程生成。
