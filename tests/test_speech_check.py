@@ -47,6 +47,29 @@ class SpeechCheck(unittest.TestCase):
             with self.assertRaises(ValueError):
                 m.check(p/'missing-timeline', p/'audio', p/'asr')
 
+    def test_independent_asr_requires_complete_matching_speech(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d)
+            (p/'timeline').write_text(json.dumps({'segments': [{'index': 0, 'text': '剧情刚好下饭'}]}))
+            (p/'audio').write_bytes(b'current audio')
+            ah = m.digest((p/'audio').read_bytes())
+            (p/'asr').write_text(json.dumps({'audio_sha256': ah, 'stage': 'source', 'text': '刚好下饭'}))
+            r = m.check(p/'timeline', p/'audio', p/'asr')
+            (p/'clip').write_bytes(b'current excerpt')
+            (p/'other-asr').write_text(json.dumps({'text': '剧情刚好下饭'}))
+            alt = {'parent_audio_sha256': ah, 'segment_indices': [0], 'clip': 'clip', 'clip_sha256': m.digest((p/'clip').read_bytes()), 'raw_asr': 'other-asr', 'raw_asr_sha256': m.digest((p/'other-asr').read_bytes())}
+            (p/'alt').write_text(json.dumps(alt))
+            review = {'audio_sha256': ah, 'script_sha256': r['script_sha256'], 'resolutions': [{'id': r['issues'][0]['id'], 'basis': 'independent_asr', 'reason': 'Independent complete segment recognition', 'evidence': 'alt', 'evidence_sha256': m.digest((p/'alt').read_bytes())}]}
+            (p/'review').write_text(json.dumps(review))
+            self.assertEqual(m.check(p/'timeline', p/'audio', p/'asr', p/'review')['content_gate'], 'pass')
+            (p/'other-asr').write_text(json.dumps({'text': '刚好下饭'}))
+            alt['raw_asr_sha256'] = m.digest((p/'other-asr').read_bytes())
+            (p/'alt').write_text(json.dumps(alt))
+            review['resolutions'][0]['evidence_sha256'] = m.digest((p/'alt').read_bytes())
+            (p/'review').write_text(json.dumps(review))
+            with self.assertRaises(ValueError):
+                m.check(p/'timeline', p/'audio', p/'asr', p/'review')
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -71,7 +71,7 @@ def check(timeline, audio, transcript, review=None):
             if key not in lookup or key in seen:
                 raise ValueError('Unknown/duplicate issue resolution')
             seen.add(key)
-            if resolution.get('basis') not in ('listened_asr_error', 'orthographic_equivalence'):
+            if resolution.get('basis') not in ('listened_asr_error', 'orthographic_equivalence', 'independent_asr'):
                 raise ValueError('A real audio defect must be repaired, not waived')
             if not resolution.get('reason', '').strip():
                 raise ValueError('Resolution requires a specific reason')
@@ -82,6 +82,24 @@ def check(timeline, audio, transcript, review=None):
             path = review.parent / resolution['evidence']
             if not path.is_file() or digest(path.read_bytes()) != resolution.get('evidence_sha256'):
                 raise ValueError('Resolution evidence absent or changed')
+            if resolution['basis'] == 'independent_asr':
+                alternative = json.loads(path.read_text())
+                if alternative.get('parent_audio_sha256') != audio_hash:
+                    raise ValueError('Independent ASR belongs to another parent audio')
+                ids = alternative['segment_indices']
+                if not ids or len(set(ids)) != len(ids) or not set(lookup[key]['segment_indices']).issubset(ids):
+                    raise ValueError('Independent ASR does not cover affected segments')
+                selected = [s for s in segments if s['index'] in ids]
+                if len(selected) != len(ids):
+                    raise ValueError('Independent ASR includes unknown segments')
+                clip = path.parent / alternative['clip']
+                raw = path.parent / alternative['raw_asr']
+                if digest(clip.read_bytes()) != alternative['clip_sha256'] or digest(raw.read_bytes()) != alternative['raw_asr_sha256']:
+                    raise ValueError('Independent audio/ASR changed')
+                alternative_text = json.loads(raw.read_text())['text']
+                if compare(selected, alternative_text)[1]:
+                    raise ValueError('Independent ASR itself still contains a difference')
+                # Corroboration proves a second recognition matches; it does not establish listening.
             lookup[key].update(status='reviewed', resolution=resolution)
     unresolved = [i for i in issues if i['status'] == 'unresolved']
     return dict(stage=evidence['stage'], audio_sha256=audio_hash, script_sha256=script_hash,
