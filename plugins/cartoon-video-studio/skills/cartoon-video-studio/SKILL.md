@@ -42,3 +42,7 @@ description: 视频工作室统一入口，根据话题、素材和用户要求�
 ## 发布
 
 仅在用户明确要求发布时用 [发布规范](references/publishing.md)。安装插件、生成视频或R2交付本身不授权发布。标题、故事文案、话题、封面先完成；已有明确发布授权无需再问一次。MCP连接不代表账号已登录，实际能力以get_capabilities为准。
+
+## 版本与交付检查
+
+制作、返修和既有作品配音替换均执行 [制作与验收证据](references/release-evidence.md)。交付前运行 release_check.py；未完成检查可交候选，但不得称质量已达标。

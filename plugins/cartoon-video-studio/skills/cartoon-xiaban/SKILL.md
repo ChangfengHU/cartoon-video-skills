@@ -13,6 +13,10 @@ description: "复用下班小人（三根头发圆头角色）的暖纸手绘形
 
 沿用当前包，不因为新选题重设计角色。用户指定新角色或新品牌时，读 [references/new-brand.md](references/new-brand.md)，另建 skill。用户本次明确要求可以覆盖默认值，但一次试验不自动改写长期品牌。
 
+## 已认可的成片参考
+
+制作与返修先读 [双成片范例](references/approved-examples.md)：买胶带和用 AI 提前干完活两条用户已发布作品。身份图校准角色，原始成片校准表演和声音；私有参考目录由环境绑定，不能用同题材本地片替代。
+
 ## 制作入口
 
 1. 阅读 [references/visual-identity.md](references/visual-identity.md) 与 [references/story-and-motion.md](references/story-and-motion.md)。用参考图约束新姿势，先保证人物是同一个，再设计新场景。
