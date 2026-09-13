@@ -10,6 +10,15 @@ class CosyTests(unittest.TestCase):
   return b.getvalue(),'request-test'
  def test_instruction_duration_and_idempotence(self):
   r=m.synthesize(self.voice,self.rows,self.p,self.provider);self.assertEqual(r[0]['duration_seconds'],1);self.assertEqual(self.calls[0]['input']['instruction'],'轻松收尾');m.synthesize(self.voice,self.rows,self.p,self.provider);self.assertEqual(len(self.calls),1)
+ def test_signed_oss_http_result_uses_https_without_altering_signature(self):
+  u='http://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/audio.wav?Signature=x%2By&Expires=42'
+  self.assertEqual(m.secure_audio_url(u),'https'+u[4:])
+  with self.assertRaises(ValueError):m.secure_audio_url('http://unrelated.example/audio.wav')
+ def test_streaming_header_does_not_fabricate_duration(self):
+  import struct
+  data,rid=self.provider({});raw=bytearray(data);struct.pack_into('<I',raw,4,0xffffffff);struct.pack_into('<I',raw,40,0xffffffff)
+  r=m.synthesize(self.voice,self.rows,self.p,lambda b:(bytes(raw),rid));self.assertEqual(r[0]['duration_seconds'],1);self.assertTrue(r[0]['streaming_header_normalized'])
+  with wave.open(str(self.p/'voice-00.wav'),'rb') as w:self.assertEqual(w.getnframes(),24000)
  def test_unknown_never_retried(self):
   def fail(body):self.calls.append(body);raise TimeoutError('private')
   with self.assertRaises(RuntimeError):m.synthesize(self.voice,self.rows,self.p,fail)

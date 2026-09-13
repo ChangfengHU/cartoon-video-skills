@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 """Reuse an authorized Cosy voice; no enrollment and no automatic paid retries."""
 from pathlib import Path
-import argparse, hashlib, io, json, os, urllib.request, wave
+import argparse, hashlib, io, json, os, urllib.request, urllib.parse, wave
 
 def save(path, value):
     temp=path.with_suffix('.tmp');temp.write_text(json.dumps(value,ensure_ascii=False,indent=2));temp.replace(path)
+
+def secure_audio_url(url):
+    parsed=urllib.parse.urlsplit(url)
+    if parsed.scheme=='http' and parsed.hostname and parsed.hostname.endswith('.aliyuncs.com'):
+        return urllib.parse.urlunsplit(parsed._replace(scheme='https'))
+    if parsed.scheme!='https':raise ValueError('Unsupported audio URL scheme')
+    return url
 
 def cloud(body):
     key=os.environ.get('DASHSCOPE_API_KEY')
@@ -13,8 +20,7 @@ def cloud(body):
     if os.environ.get('DASHSCOPE_WORKSPACE_ID'): headers['X-DashScope-WorkSpace']=os.environ['DASHSCOPE_WORKSPACE_ID']
     req=urllib.request.Request('https://dashscope.aliyuncs.com/api/v1/services/audio/tts/SpeechSynthesizer',data=json.dumps(body).encode(),headers=headers)
     with urllib.request.urlopen(req,timeout=120) as response: result=json.load(response)
-    url=result['output']['audio']['url']
-    if not url.startswith('https://'):raise ValueError('Expected HTTPS audio URL')
+    url=secure_audio_url(result['output']['audio']['url'])
     with urllib.request.urlopen(url,timeout=90) as response: audio=response.read()
     return audio,result.get('request_id')
 
@@ -44,9 +50,18 @@ def synthesize(voice, segments, output, provider=cloud):
         entry={'index':i,'state':'submitted','request':body};save(record,entry)
         try:
             data,request_id=provider(body);entry['request_id']=request_id
+            provider_sha256=hashlib.sha256(data).hexdigest()
             with wave.open(io.BytesIO(data),'rb') as w:
-                duration=w.getnframes()/w.getframerate();rate=w.getframerate();channels=w.getnchannels()
-                if duration<=0:raise ValueError('Empty audio')
+                rate=w.getframerate();channels=w.getnchannels();width=w.getsampwidth();declared=w.getnframes()
+                if w.getcomptype()!='NONE':raise ValueError('Expected PCM WAV')
+                pcm=w.readframes(declared)
+            if not pcm or len(pcm)%(channels*width):raise ValueError('Incomplete PCM audio')
+            frames=len(pcm)//(channels*width);duration=frames/rate
+            # Streaming WAV can declare 0xffffffff: measure actual bytes and freeze a valid header.
+            normalized=io.BytesIO()
+            with wave.open(normalized,'wb') as w:
+                w.setnchannels(channels);w.setsampwidth(width);w.setframerate(rate);w.writeframes(pcm)
+            data=normalized.getvalue();entry.update(provider_sha256=provider_sha256,streaming_header_normalized=declared!=frames)
             audio.write_bytes(data);entry.update(state='success',file=audio.name,sha256=hashlib.sha256(data).hexdigest(),duration_seconds=duration,sample_rate=rate,channels=channels);save(record,entry);results.append(entry)
         except Exception as error:
             entry.update(state='unknown',error_type=type(error).__name__,note='No automatic retry; provider may have accepted or charged the request');save(record,entry);raise RuntimeError('Voice request did not produce a verified WAV; inspect saved state') from None
