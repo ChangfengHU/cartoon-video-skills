@@ -14,7 +14,7 @@ for c in registry['characters']:
   if isinstance(a,dict) and 'path' in a and 'sha256' in a:assert hashlib.sha256((skills/c['skill']/a['path']).read_bytes()).hexdigest()==a['sha256']
 lock=json.loads((pkg/'upstream-skills.lock.json').read_text())
 for n,digest in lock['files'].items():assert hashlib.sha256((pkg/'skills'/n).read_bytes()).hexdigest()==digest
-m=json.loads((pkg/'.mcp.json').read_text());assert len(m['mcpServers'])==4
+m=json.loads((pkg/'.mcp.json').read_text());assert set(m['mcpServers'])=={'vyibc-cartoon-assets','vyibc-image','vyibc-douyin','vyibc-youtube','vyibc-voice'}
 for n,c in m['mcpServers'].items():assert c['url'].startswith('https://') and c.get('bearer_token_env_var') and 'headers' not in c
 print(json.dumps({'skills':len(names),'characters':len(ids),'mcp':len(m['mcpServers']),'mirrors':'identical','upstream_files':len(lock['files'])}))
 

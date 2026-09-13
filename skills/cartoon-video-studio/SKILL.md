@@ -29,6 +29,8 @@ description: 视频工作室统一入口，根据话题、素材和用户要求�
 
 视频从 [HyperFrames](../hyperframes/SKILL.md) 进入，复杂卡通执行 [general-video](../general-video/SKILL.md)。结构、动画、镜头、混音、CLI与media-use均随包提供；二进制运行环境、TTS账户和远端服务授权不随安装自动获得。
 
+配音先读 [配音制作](../voice-production/SKILL.md)：支持豆包MCP配音，以及已授权Cosy音色的独立HTTP适配器；私人称呼经resolve_voice解析，不能默认绑定到某角色。
+
 本工作室已可使用授权的豆包HTTP配音，不要求因通用media-use默认路线另开新付费服务或下载模型；环境检查见 [运行依赖](references/runtime.md)。人物参考生成必须实际提供角色图，不采用默认写实人像预设。
 
 先冻结完整剧本；按真实配音文件时长排场景、字幕及动作。首屏给出值得继续看的问题、变化或冲突，结尾兑现本片承诺并留出收束时间；有角色时保留必要表演反应。动作预备、接触、反馈和停顿要服务台词，而非持续飘动。

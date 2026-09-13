@@ -1,13 +1,13 @@
 # 卡通视频工作室
 
-`cartoon-video-studio` 0.3.0：一个插件，多套独立角色，共用制作能力。原“下班小人视频工作室”保留安装ID，中文名称升级为卡通视频工作室。
+`cartoon-video-studio` 0.4.0：一个插件，多套独立角色，共用制作能力。原“下班小人视频工作室”保留安装ID，中文名称升级为卡通视频工作室。
 
 ## 内容
 
 - 工作室入口：cartoon-video-studio；选择角色、冻结工程、组织制作与授权发布。
 - 角色：cartoon-xiaban（三根头发的下班小人）、cartoon-hongyi（红衣侧辫女生）。各有素材、声线、动作与认可参考，后续角色可独立加入。
 - 共用10个skills：hyperframes、general-video、hyperframes-core、hyperframes-cli、hyperframes-animation、hyperframes-keyframes、hyperframes-creative、hyperframes-audio、hyperframes-registry、media-use。
-- 4个HTTP MCP声明：vyibc-cartoon-assets、vyibc-image、vyibc-douyin、vyibc-youtube。分别负责素材、生图、授权发布、音频转写等；当前工具能力以服务返回为准。
+- 5个HTTP MCP声明：vyibc-cartoon-assets、vyibc-image、vyibc-douyin、vyibc-youtube、vyibc-voice。分别负责素材、生图、授权发布、音频转写等；当前工具能力以服务返回为准。
 
 角色、视觉风格和故事形式独立。两名现有角色均属暖纸手绘，不表示工作室只能做办公室或情感独白。
 
@@ -54,7 +54,7 @@ canonical来源在skills/，插件skills/由脚本镜像；不手工维护两套
 
 ## 0.3 制作流程
 
-17个skills：工作室、两套角色、独立vyibc-character-design、studio-director、studio-music、studio-quality，以及10个既有HyperFrames/媒体skills。4个MCP连接不变。选题研究是独立可选输入，不属于每片必经步骤。
+18个skills：工作室、两套角色、独立vyibc-character-design、studio-director、studio-music、studio-quality、voice-production，以及10个既有HyperFrames/媒体skills。新增配音MCP，共5个连接。选题研究是独立可选输入，不属于每片必经步骤。
 
 镜头任务账本保存依赖、文件哈希、远端任务ID和历史；脚本不自动调用云任务，也不保证崩溃窗口内恰好提交一次。质检汇总不产生用户认可。资产服务1.1新增范围内标签/角色/BPM/许可筛选和不可覆盖的修订，保留旧素材ID；R2目录没有迁移D1，不扩大原凭据权限。
 

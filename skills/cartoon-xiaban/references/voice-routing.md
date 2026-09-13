@@ -33,3 +33,7 @@ R2 是文件传输层，不是配音模型。用任务独立对象前缀、私�
 - [Workers AI 额度与计费](https://developers.cloudflare.com/workers-ai/platform/pricing/)
 
 备用成功是继续制作的条件，不是降低内容、角色表演、声画同步或音乐质量的理由。制作记录明确实际使用路径及尚未验证的能力。
+
+## 已授权私人声线
+
+用户说“Cosy 我的音色”时，走工作室随包的 [voice-production](../../voice-production/SKILL.md)，先由MCP解析服务端金库映射，再冻结本片provider/model/voice_id。这个称呼不是下班小人的品牌默认声线，也不意味着任何新增性格或场景偏好。复用已选音色，不自动新建克隆；整片更换后所有源音频和最终混音检查均重新取证。
