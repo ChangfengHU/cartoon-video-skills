@@ -60,3 +60,22 @@ not enabled. See repository VALIDATION.md for actual production checks.
 Search adds tags_all, character_id, license_status, archive_allowed and bpm_min/max. Filters apply per page, not to a globally sorted result. All accesses remain inside the authenticated prefix. Character associations do not grant new tenant/brand access.
 
 asset_revise(id,patch,reason) creates a content-addressed successor preserving the original source, rights and media reference. Old IDs remain usable by frozen projects. Lifecycle retired is metadata, not revocation or deletion. Concurrent revisions can fork; consumers must inspect supersedes, not assume hash order is chronology. Revert by selecting the prior ID. No D1 migration or principal widening in this release.
+
+### Explicitly authorized private research references
+
+User-authorized private source previews now have a narrow card contract:
+`kind:reference`, `personal_reference:true`, no `character_ids`, and license
+`status:user_authorized_private_reference`, `scope:private_reference_only`,
+`publication:not_for_publication`, `archive_allowed:true`, with specific authorization
+evidence. This records permission for internal reference display, not a claim that a
+third party granted public redistribution rights. They remain in existing authenticated
+R2 scope. `project_freeze` refuses these as publication assets even if a caller supplies
+an apparently verified project review. Personal voice clones remain excluded.
+
+Fleet references point to these via `technical.references[].preview_asset_id`, and
+render only the same-origin authenticated image proxy. Do not put private binary URLs
+or credentials in source metadata. The source post URL remains independently recorded.
+
+2026-09-14 actual checks: two real generation-input previews uploaded and full GET SHA
+verified; anonymous service file requests returned401. R2 managed public domain was
+disabled and custom domain list empty. No public upload of these previews was performed.

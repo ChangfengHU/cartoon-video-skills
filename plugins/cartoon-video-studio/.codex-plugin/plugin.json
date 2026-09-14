@@ -1,15 +1,15 @@
 {
   "name": "cartoon-video-studio",
-  "version": "0.4.2",
-  "description": "多角色卡通制作：编导、角色设计、配乐、镜头任务恢复、质检与授权发布。",
+  "version": "0.5.0",
+  "description": "多风格人物制作：真实参考、角色档案、按角色选声、示例片、质量基准与私有素材库。",
   "author": {
     "name": "ChangfengHU"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "卡通视频工作室",
-    "shortDescription": "多角色 · 私人音色复用 · 成片质量检查",
-    "longDescription": "19个skill覆盖编导、角色、配音、配乐、HyperFrames和实际成片检查，5个MCP声明包含配音服务。支持金库私人称呼解析和授权Cosy音色适配；安装不携带私人声线或服务凭据。热点现场解读与角色卡通分流，技术通过不等于质量认可。 素材取材支持现成音效获取流程和固定版本SVG道具下载。",
+    "shortDescription": "真实参考可预览 · 按角色选声 · 可恢复制作",
+    "longDescription": "20个skill与8个MCP声明覆盖参考采集、人物设计、配音配乐、HyperFrames、实际成片检查与私有素材入库。角色作为独立版本资产扩充，工作流读取当前工作室选声策略，认可作品按范围冻结基准。运行环境、个人账号与服务凭据不随安装提供；不自动运行定时任务或发布视频。",
     "developerName": "ChangfengHU",
     "category": "Productivity",
     "capabilities": [

@@ -1,13 +1,15 @@
 ---
 name: voice-production
-description: 通过vyibc-voice查询豆包音色、短句试听、分角色分段配音及局部重做；输出真实音频与时长供视频排镜头，可复用已授权Cosy复刻音色；不承担转写或自动创建新克隆。
+description: 按角色与排除策略选声，通过vyibc-voice制作豆包配音，或独立HTTP适配器调用Qwen预置声及instructions、复用已授权Cosy声；输出试听、真实音频、时长与回执，支持局部重做，不自动创建新克隆。
 ---
 
 # 配音制作
 
 需要连接 https://fleet.vyibc.com/mcp/voice ，使用Fleet既有管理员鉴权。先读tools/list和capabilities，不凭本文件推断上线版本。凭据由后端从金库service:doubao-tts读取；不在参数、提示词或工程中复制密钥。
 
-选声先读角色已冻结的音色绑定；新角色通过list_voices按名称、语言文字、男女声、场景筛选，get_voice确认准确ID。官方目录收录不等于账号权限或使用许可。check_config默认仅检查配置存在；probe=true会产生短句合成调用与可能费用，只有本次voice_type的成功请求能证明该次权限。
+选声先读当前项目/工作室voice_policy.excluded_voice_ids禁用音色策略，再读角色已冻结的音色绑定；新禁用规则优先于旧绑定和收藏别名。收藏只是私人称呼，不等于新任务授权选择；禁用项不得进入候选、默认、故障回退或试听请求。旧已认可成片保持原音轨，角色未来推荐通过追加版本更新，不反向改写历史。
+
+新角色按 [自动选声流程](references/voice-selection.md) 从角色定位推导声音要求，再按供应商/模型兼容性查询准确ID。豆包通过list_voices按名称、语言文字、男女声、场景筛选，get_voice确认准确ID。官方目录收录不等于账号权限或使用许可。check_config默认仅检查配置存在；probe=true会产生短句合成调用与可能费用，只有本次voice_type的成功请求能证明该次权限。
 
 ## 真实生产
 
@@ -18,7 +20,7 @@ description: 通过vyibc-voice查询豆包音色、短句试听、分角色分�
 - 局部返修用retry_segments，传job_id、稳定retry_key和segments中的index及所需文字/音色/语速改动。保留其他已完成段，新任务记录parent_job_id。未完成段必须明确选入；原任务仍活跃时不建并发重做。未知结果重试需要retry_uncertain=true，并可能再次计费。
 - cancel只停止后续段，已在途请求可能完成并保存；不退款、不删除音频。卡住任务等待10分钟lease后，再检查状态决定是否明确重试。
 
-按语音真实长度安排动作，试听自然度、重音、断句、末字和背景音乐遮蔽。文件可解码、合成成功或ASR相符都不等于配音质量通过；没听过的范围写pending。豆包MCP的synthesize不支持Cosy或情绪参数；已有Cosy音色走下述独立适配器。
+按语音真实长度安排动作，试听自然度、重音、断句、末字和背景音乐遮蔽。文件可解码、合成成功或ASR相符都不等于配音质量通过；没听过的范围写pending。豆包MCP的synthesize不支持Cosy、Qwen或情绪参数；已有Cosy音色走下述独立适配器，Qwen预置声用scripts/qwen_synthesize.py走其真实供应商API（用法见自动选声流程），不能把不同供应商ID直接塞入豆包MCP。
 
 ## 安装与回滚
 

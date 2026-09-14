@@ -19,6 +19,18 @@
     "vyibc-voice": {
       "url": "https://fleet.vyibc.com/mcp/voice",
       "bearer_token_env_var": "VYIBC_VOICE_TOKEN"
+    },
+    "vyibc-behavior": {
+      "url": "https://fleet.vyibc.com/mcp/behavior",
+      "bearer_token_env_var": "VYIBC_BEHAVIOR_TOKEN"
+    },
+    "vyibc-xiaohongshu": {
+      "url": "https://fleet.vyibc.com/mcp/xiaohongshu",
+      "bearer_token_env_var": "VYIBC_XIAOHONGSHU_TOKEN"
+    },
+    "vyibc-vault": {
+      "url": "https://fleet.vyibc.com/mcp/vault",
+      "bearer_token_env_var": "VYIBC_VAULT_TOKEN"
     }
   }
 }

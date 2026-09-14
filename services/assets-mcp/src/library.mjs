@@ -37,10 +37,12 @@ export function validateCard(card, binary = false) {
   assert(Array.isArray(card.use_cases) && card.use_cases.length > 0 && card.use_cases.every(x => typeof x === 'string'), 'use_cases required');
   assert(Array.isArray(card.tags ?? []) && (card.tags ?? []).every(x => typeof x === 'string'), 'Invalid tags');
   for (const k of ['status','scope','evidence']) requireText(card.license, k);
-  assert(!card.personal_reference && card.voice_identity !== 'user_clone', 'Personal references and cloned personal voices excluded');
+  const privateReference = card.license.status === 'user_authorized_private_reference';
+  if(privateReference)assert(card.kind === 'reference' && card.personal_reference === true && card.license.scope === 'private_reference_only' && card.license.publication === 'not_for_publication' && card.license.archive_allowed === true && !(card.character_ids?.length), 'Private references require explicit restricted scope and no character card identity');
+  assert((!card.personal_reference || privateReference) && card.voice_identity !== 'user_clone', 'Personal references require restricted authorization; cloned personal voices excluded');
   for (const key of ['id','object','created_at']) assert(!(key in card), 'Server-owned card field');
   if (binary) {
-    assert(card.license.archive_allowed === true && ['verified_for_archive','user_authorized_generated'].includes(card.license.status), 'Binary archive requires documented archive rights');
+    assert(card.license.archive_allowed === true && ['verified_for_archive','user_authorized_generated','user_authorized_private_reference'].includes(card.license.status), 'Binary archive requires documented archive rights');
     assert(card.kind !== 'voice' || card.voice_identity === 'provider_preset', 'Only provider-preset voice output may be archived');
   }
 }
@@ -188,6 +190,7 @@ export class Library {
     for (const item of selection.selected) {
       assert(!ids.has(item.asset_id), 'Duplicate selection'); ids.add(item.asset_id);
       const record = await this.load('records', item.asset_id), review = item.project_review;
+      assert(record.license?.status !== 'user_authorized_private_reference' && record.license?.publication !== 'not_for_publication', 'Private research references cannot be selected as publication assets');
       requireText(item,'reason');
       assert(review?.status === 'verified_for_project' && stringArray(review.allowed_platforms) && review.allowed_platforms.includes(selection.platform) && validDate(review.checked_at), 'Fresh project-specific rights review required');
       requireText(review,'evidence');

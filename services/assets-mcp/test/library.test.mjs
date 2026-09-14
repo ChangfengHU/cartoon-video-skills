@@ -113,3 +113,9 @@ test('revision preserves original media and rights; identical retry deduplicates
  const other=setup({...principal,prefix:'other/v2',legacy_prefix:undefined},l.bucket);
  await assert.rejects(()=>other.revise(a.id,{tags:['leak']},'invalid'),{status:404});
 });
+test('explicit private reference archives but cannot enter publication freeze',async()=>{
+ const l=setup(),r={...card,kind:'reference',personal_reference:true,license:{status:'user_authorized_private_reference',scope:'private_reference_only',publication:'not_for_publication',archive_allowed:true,evidence:'user explicitly authorized private research preview'}};
+ const a=await l.register(r,{bytes:new Uint8Array([1,2,3]),extension:'.jpg'});assert.equal((await l.get(a.id)).asset.license.publication,'not_for_publication');
+ await assert.rejects(()=>l.freeze({project:'x',story_intent:'x',platform:'douyin',selected:[{asset_id:a.id,reason:'x',project_review:{status:'verified_for_project',allowed_platforms:['douyin'],checked_at:'2026-09-14',evidence:'x'}}]}),/Private research references/);
+ for(const patch of [{kind:'image'},{personal_reference:false},{character_ids:['ali']},{license:{...r.license,scope:'public'}},{license:{...r.license,publication:'allowed'}}])assert.throws(()=>validateCard({...r,...patch},true));
+});
