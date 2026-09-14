@@ -15,6 +15,8 @@ description: 视频工作室统一入口，根据话题、素材和用户要求�
 
 角色、音乐、音效、姿势、场景、声线和动画组件均按 [素材管理](references/asset-management.md) 登记、检索及冻结。选角须读人物档案，不能只按外观或上次使用选人。音乐建议标签不等于听审通过，成片满意不等于逐项素材认可。
 
+音效、小物品、SVG道具缺失时使用 [素材取材](../studio-materials/SKILL.md)，获取现成素材并按角色画风处理；配乐与整片声音设计继续交 studio-music。
+
 ## 制作路由
 
 用户思路/外部资料包 → [编导](../studio-director/SKILL.md) → 选已有角色或 [独立角色设计](../vyibc-character-design/SKILL.md) → [配乐](../studio-music/SKILL.md) → HyperFrames → [成片质检](../studio-quality/SKILL.md)。选题搜索与事实研究保持独立，仅用户需要时接入；不把研究设为制作的前置门槛。
