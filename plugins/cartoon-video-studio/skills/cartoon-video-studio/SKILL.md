@@ -50,3 +50,5 @@ description: 视频工作室统一入口，根据话题、素材和用户要求�
 ## 版本与交付检查
 
 制作、返修和既有作品配音替换均执行 [制作与验收证据](references/release-evidence.md)。交付前运行 release_check.py；未完成检查可交候选，但不得称质量已达标。
+
+角色片与实质动作返修读取[连续表演与质量基线](../studio-character-workflow/references/continuity-workflow.md)：当前参考锁→动作意图/接触/末状态→难点实际试片→完整MP4与原版对照。运行studio-quality的continuity_check核对试片输入、采样和最终文件是否过期，再执行release_check；没有直接视听证据保持候选。

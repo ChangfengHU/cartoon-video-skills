@@ -34,3 +34,5 @@ description: 对工作室实际成片与连续动作进行质量检查，记录�
 按 [制作与验收证据](../cartoon-video-studio/references/release-evidence.md) 核对当前文件哈希、参考版本、逐维度范围及方法，并运行工作室 release_check.py。ASR 不能作为表演听审；旧文件验收不能复用于新文件；模型评价与实测矛盾时不采纳其通过结论。
 
 连续采样生成联系表时，先在滤镜链中trim到声明范围，再fps和tile；仅用输出参数-t可能让tile先读入范围外帧。记录原片时间、fps和实际查看的文件；末尾补格不算原片黑帧。
+
+角色连续动作按[连续表演工作流](../studio-character-workflow/references/continuity-workflow.md)检查。`scripts/sample_motion.py`生成有源文件hash的连续帧；`scripts/continuity_check.py`关联当前动作输入、试片和final采样，输入改变后旧证据不能清关。它不检测美感、不替代release_check，也不把合理停顿或自然重复自动判坏。

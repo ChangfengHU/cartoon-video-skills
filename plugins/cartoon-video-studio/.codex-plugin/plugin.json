@@ -1,15 +1,15 @@
 {
   "name": "cartoon-video-studio",
-  "version": "0.6.1",
-  "description": "多风格人物制作：真实参考、角色档案、按角色选声、示例片、质量基准与私有素材库。",
+  "version": "0.7.0",
+  "description": "多风格角色视频制作：参考锁、连续表演试片、按角色选声、成片证据与私有素材库。",
   "author": {
     "name": "ChangfengHU"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "卡通视频工作室",
-    "shortDescription": "角色专属指令 · 自动选题 · 完整制作与质检",
-    "longDescription": "29个skill（含9个薄指令入口）、8个MCP声明。下班小人、红衣、阿栗独立入口；新角色指令完成参考、设计、选声与视频；不指定主题时调用独立研究能力。帮助展示实际预设和默认行为。人物私有档案与认可范围动态读取，安装不携带账号，不自动发布。",
+    "shortDescription": "角色专属指令 · 连续表演试片 · 成片证据",
+    "longDescription": "29个skill（含9个薄指令入口）、8个MCP声明。下班小人、红衣、阿栗独立入口；新角色指令完成参考、设计、选声与视频；不指定主题时调用独立研究能力。帮助展示实际预设和默认行为。人物私有档案与认可范围动态读取，安装不携带账号，不自动发布。 0.7.0增加动作时序与试片输入绑定、实际MP4连续采样、过期证据检测；自动检查不代表审美通过。",
     "developerName": "ChangfengHU",
     "category": "Productivity",
     "capabilities": [
