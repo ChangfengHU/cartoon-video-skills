@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "commands": [
+    {
+      "name": "studio",
+      "description": "工作室菜单：选择已有角色或创建新角色",
+      "argument_hint": "[帮助或制作要求]",
+      "mode": "menu",
+      "character_name": null,
+      "codex": "$studio",
+      "slash": "/studio",
+      "legacy": "/prompts:studio",
+      "defaults": "help"
+    },
+    {
+      "name": "studio-xiabanxiaoren",
+      "description": "下班小人：生活观察、消费与职场喜剧",
+      "argument_hint": "[主题；留空主动研究选题]",
+      "mode": "character",
+      "character_name": "下班小人",
+      "codex": "$studio-xiabanxiaoren",
+      "slash": "/studio-xiabanxiaoren",
+      "legacy": "/prompts:studio-xiabanxiaoren",
+      "defaults": "research_topic"
+    },
+    {
+      "name": "studio-hongyi",
+      "description": "红衣女生：女性独白、生活喜剧与反转故事",
+      "argument_hint": "[主题；留空主动研究选题]",
+      "mode": "character",
+      "character_name": "红衣女生",
+      "codex": "$studio-hongyi",
+      "slash": "/studio-hongyi",
+      "legacy": "/prompts:studio-hongyi",
+      "defaults": "research_topic"
+    },
+    {
+      "name": "studio-ali",
+      "description": "阿栗：都市生活、机灵吐槽与自嘲喜剧",
+      "argument_hint": "[主题；留空主动研究选题]",
+      "mode": "character",
+      "character_name": "阿栗",
+      "codex": "$studio-ali",
+      "slash": "/studio-ali",
+      "legacy": "/prompts:studio-ali",
+      "defaults": "research_topic"
+    },
+    {
+      "name": "studio-new",
+      "description": "新角色：真实参考、设计、选声并制作视频",
+      "argument_hint": "[抖音喜欢/小红书/参考图/主题；可只设计角色]",
+      "mode": "new",
+      "character_name": null,
+      "codex": "$studio-new",
+      "slash": "/studio-new",
+      "legacy": "/prompts:studio-new",
+      "defaults": "research_topic"
+    },
+    {
+      "name": "studio-help",
+      "description": "查看指令与角色介绍、预设提示词和使用示例",
+      "argument_hint": "[指令名]",
+      "mode": "help",
+      "character_name": null,
+      "codex": "$studio-help",
+      "slash": "/studio-help",
+      "legacy": "/prompts:studio-help",
+      "defaults": "help"
+    },
+    {
+      "name": "studio-revise",
+      "description": "修改已有作品并对照旧版检查",
+      "argument_hint": "[工程或视频] [修改要求]",
+      "mode": "revise",
+      "character_name": null,
+      "codex": "$studio-revise",
+      "slash": "/studio-revise",
+      "legacy": "/prompts:studio-revise",
+      "defaults": "resolve_explicit_project"
+    },
+    {
+      "name": "studio-check",
+      "description": "检查实际成片，不默认修改",
+      "argument_hint": "[视频或工程]",
+      "mode": "check",
+      "character_name": null,
+      "codex": "$studio-check",
+      "slash": "/studio-check",
+      "legacy": "/prompts:studio-check",
+      "defaults": "resolve_explicit_project"
+    },
+    {
+      "name": "studio-publish",
+      "description": "准备文案封面并发布指定作品",
+      "argument_hint": "[作品] [平台/账号]",
+      "mode": "publish",
+      "character_name": null,
+      "codex": "$studio-publish",
+      "slash": "/studio-publish",
+      "legacy": "/prompts:studio-publish",
+      "defaults": "resolve_explicit_project"
+    }
+  ],
+  "runtime_tested": []
+}

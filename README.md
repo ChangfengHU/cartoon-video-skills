@@ -61,3 +61,7 @@ canonical来源在skills/，插件skills/由脚本镜像；不手工维护两套
 角色设计组件按character-design.lock.json固定来源；本地包不捆绑参考图远端文件、不新增付费服务、不自动改浏览器登录。新增编导/配乐/质检可独立读取。
 
 恢复：按Git提交恢复插件文件并重新安装；工作室任务invalidate仅标记过期，不删除媒体。素材修订可重新选择旧ID。线上Worker代码回滚须保留后续无关更新，服务认证和R2数据不跟随代码回滚删除。
+
+## 0.6.0 角色指令
+
+主入口 studio、studio-xiabanxiaoren、studio-hongyi、studio-ali、studio-new、studio-help；辅助返修/检查/发布。每个入口包含实际预设，角色制作未给主题时调用独立研究，新角色默认完成视频。Codex使用 $名称，Pi/Claude项目模板使用 /名称。详见 [安装与完整预设](plugins/cartoon-video-studio/command-support/README.md)。原有20个制作Skill保持职责，新增9个薄入口；不是9套重复制作流程。
