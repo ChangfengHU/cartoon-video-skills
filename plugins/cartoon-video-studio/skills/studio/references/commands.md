@@ -36,3 +36,5 @@
 视频交付沿用工作室要求：真实MP4、完整剧本与分镜、素材/音频清单、PUBLICATION、QA、实际截图/连续动作采样及复现工程。release_check.py 是证据检查，不是美感评分；实际成片修改后，旧哈希绑定的通过记录失效。候选作品明确标注未验证项，阻断问题未解决不进入发布。不得在没有工具回执时声称已上传R2、已入库、已更新Fleet或已发布。
 
 音乐按故事重新选，发布文案不堆制作信息；必要署名与许可沿用工作室规范。默认制作和角色命令都不包含社交发布授权。
+
+发布分支须按 cartoon-video-studio/references/publishing.md 提供 characterIds、studioTaskId、sourceSha256，检查 registration 并读回角色/任务已发布列表。平台发布成功但登记失败，只用 register_published_video 补登记，禁止重复发布。

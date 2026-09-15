@@ -50,6 +50,8 @@ $ARGUMENTS
 
 音乐按故事重新选，发布文案不堆制作信息；必要署名与许可沿用工作室规范。默认制作和角色命令都不包含社交发布授权。
 
+发布分支须按 cartoon-video-studio/references/publishing.md 提供 characterIds、studioTaskId、sourceSha256，检查 registration 并读回角色/任务已发布列表。平台发布成功但登记失败，只用 register_published_video 补登记，禁止重复发布。
+
 # 指令帮助
 
 - `/studio`：工作室菜单：选择已有角色或创建新角色。参数：[帮助或制作要求]。
