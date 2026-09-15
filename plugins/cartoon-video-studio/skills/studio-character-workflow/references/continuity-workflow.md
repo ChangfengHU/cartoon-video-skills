@@ -41,3 +41,5 @@
 - final额外：`target:{path,sha256}, final_samples:[{path,sha256}]`；每份采样绑定当前target。
 
 示例调用：`python3 sample_motion.py film.mp4 --project . --out qa/walk-v2 --start 12 --end 15 --fps 8`。采样频率由动作快慢选择，不是固定质量阈值。
+
+步态与分层动作的候选拒用、支撑脚约束、显隐与审美区分见[专项返修](gait-and-layer-repair.md)，出现对应问题时必须加载。

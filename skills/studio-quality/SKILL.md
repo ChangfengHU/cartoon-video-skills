@@ -36,3 +36,5 @@ description: 对工作室实际成片与连续动作进行质量检查，记录�
 连续采样生成联系表时，先在滤镜链中trim到声明范围，再fps和tile；仅用输出参数-t可能让tile先读入范围外帧。记录原片时间、fps和实际查看的文件；末尾补格不算原片黑帧。
 
 角色连续动作按[连续表演工作流](../studio-character-workflow/references/continuity-workflow.md)检查。`scripts/sample_motion.py`生成有源文件hash的连续帧；`scripts/continuity_check.py`关联当前动作输入、试片和final采样，输入改变后旧证据不能清关。它不检测美感、不替代release_check，也不把合理停顿或自然重复自动判坏。
+
+涉及步态、切图闪动或人物分层返修时，执行[步态与分层返修](../studio-character-workflow/references/gait-and-layer-repair.md)：先核对素材与新旧实际试片，区分显隐修复和动作自然度；未解决项不自动成为通过的质量基线。
