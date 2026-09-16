@@ -20,7 +20,7 @@ codex plugin add cartoon-video-studio@personal
 
 保留现有personal marketplace来源；如果有同名冲突，先核对来源，不能覆盖其他人的市场。已有安装需刷新该GitHub来源并重新安装插件，随后新线程读取新版skills。Fleet能力广场展示固定源码快照，不代表客户端自动升级。
 
-Codex插件结构已校验；Claude客户端安装未验证。二进制环境另需Node22+、FFmpeg、Python3、Chromium、项目内HyperFrames。包内提供指令，不捆绑这些二进制、模型、用户凭据或豆包付费额度。
+从 Fleet 能力广场复制的工作室授权安装命令会在 Linux x64/ARM64 的用户目录锁定 Node 22、HyperFrames 0.8.33、受管 Chromium 和 MCP 启动器；缺少 FFmpeg/中文字体时只在可用的 Debian/Ubuntu 包管理器上补齐。它还会实际渲染并 ffprobe 回读一段 1080×1920、30fps 的临时 MP4，再写入不含 token 的安装回执。`--runtime check` 只诊断，`--runtime skip` 仅供已受管环境，`--repair` 才会轮换本插件已有 MCP 条目。此冒烟结果不代表云端账号已登录、配音/生图已获授权或成片审美通过。Claude 客户端安装仍未验证；安装器不会下载 TTS 模型、启用付费服务或修改既有浏览器登录。
 
 ## 授权
 
