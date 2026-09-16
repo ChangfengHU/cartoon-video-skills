@@ -68,9 +68,10 @@ import pathlib,sys
 p=pathlib.Path(sys.argv[1]); source=p.read_text(); changed=source.replace('data-duration="10"','data-duration="3"',1); assert changed!=source,'blank smoke template duration changed';p.write_text(changed)
 PY
  (cd "$SMOKE"&&HYPERFRAMES_SKIP_SKILLS=1 "$HF" check >/dev/null&&"$HF" render --fps 30 --quality draft --workers 1 --output "$TMP/smoke.mp4" >/dev/null)
- python3 - "$TMP/smoke.mp4" <<'PY'
+ ffmpeg -nostdin -y -i "$TMP/smoke.mp4" -f lavfi -i anullsrc=r=48000:cl=stereo -shortest -c:v copy -c:a aac "$TMP/smoke-aac.mp4" >/dev/null 2>&1
+ python3 - "$TMP/smoke-aac.mp4" <<'PY'
 import json,subprocess,sys
-d=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_entries','format=duration:stream=codec_name,width,height,r_frame_rate','-of','json',sys.argv[1]]));v=next((s for s in d['streams'] if s.get('codec_name')=='h264'),None);assert v and v.get('width')==1080 and v.get('height')==1920 and v.get('r_frame_rate')=='30/1',d;assert float(d['format']['duration'])>1,d
+d=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_entries','format=duration:stream=codec_name,width,height,r_frame_rate','-of','json',sys.argv[1]]));v=next((s for s in d['streams'] if s.get('codec_name')=='h264'),None);a=next((s for s in d['streams'] if s.get('codec_name')=='aac'),None);assert v and a and v.get('width')==1080 and v.get('height')==1920 and v.get('r_frame_rate')=='30/1',d;assert float(d['format']['duration'])>1,d
 PY
 fi
 python3 - "$STATE_DIR/install-receipt.json" "$STUDIO_VERSION" "$RUNTIME_DIR" "$MODE" <<'PY'
