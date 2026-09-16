@@ -1,8 +1,24 @@
 # Private cartoon asset MCP
 
-Nine tools (v1.1): `library_info`, `asset_search`, `asset_get`, `asset_register`,
+Thirteen tools (v1.2): `library_info`, `asset_search`, `character_search`,
+`character_get`, `character_assets`, `character_history`, `asset_get`, `asset_register`,
 `asset_revise`, `asset_feedback`, `asset_feedback_list`, `project_freeze`, `project_get`.
 The Skill makes videos; this service manages reusable assets and evidence only.
+
+## Character-first reads
+
+`asset_search` remains a paginated, asset-level query. Do not infer that a
+character is absent from an empty first page. New sessions should use
+`character_search` by display name or character ID, `character_get` for the
+unique current profile and `character_assets` for grouped terminal production
+assets. `character_history` is for recovery and revision review.
+
+Those four read tools derive a current view from the same scoped R2 records and
+`supersedes` graph; they do not call Fleet's browser-only `/api/media/*` and do
+not return anonymous file URLs. R2 remains the source of truth. If there are
+multiple active terminal profile revisions, the service returns a warning / 409
+instead of guessing a current character. Retired production assets are omitted
+unless `character_assets.include_retired` is explicitly true.
 
 Cloudflare Workers + an R2 binding; no CF administration token at runtime and no
 D1 yet. Authenticated principals select fixed server-side prefixes. `AUTH_CLIENTS`

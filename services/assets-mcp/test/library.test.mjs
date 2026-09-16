@@ -119,3 +119,35 @@ test('explicit private reference archives but cannot enter publication freeze',a
  await assert.rejects(()=>l.freeze({project:'x',story_intent:'x',platform:'douyin',selected:[{asset_id:a.id,reason:'x',project_review:{status:'verified_for_project',allowed_platforms:['douyin'],checked_at:'2026-09-14',evidence:'x'}}]}),/Private research references/);
  for(const patch of [{kind:'image'},{personal_reference:false},{character_ids:['ali']},{license:{...r.license,scope:'public'}},{license:{...r.license,publication:'allowed'}}])assert.throws(()=>validateCard({...r,...patch},true));
 });
+test('character views resolve the current profile without exposing paginated asset search',async()=>{
+ const l=setup({...principal,legacy_prefix:undefined});
+ const id='xuman-campus-v1';
+ const profile={...card,kind:'image',title:'许小满 · 当前档案',character_ids:[id],technical:{asset_kind:'identity_reference',character_profile:{id,name:'许小满',version:2,personality:['初入大学的局促'],speaking_style:'熟人面前更放松'},voice_recommendation:{voice_id:'zh_female_tianmeitaozi_uranus_bigtts',label:'甜美桃子'},scene_assets:{dorm:'scene-id'},preproduction:{status_label:'候选'}}};
+ const root=await l.register(profile);
+ const voice=await l.register({...card,kind:'voice',title:'甜美桃子',character_ids:[id],technical:{voice_id:'zh_female_tianmeitaozi_uranus_bigtts'}});
+ const expression=await l.register({...card,kind:'image',title:'许小满表情',character_ids:[id],technical:{asset_kind:'expression_sheet'}});
+ const action=await l.register({...card,kind:'image',title:'许小满动作',character_ids:[id],technical:{asset_kind:'action_keyposes',character_profile:{id,name:'许小满',version:2}}});
+ const scene=await l.register({...card,kind:'image',title:'宿舍背景',character_ids:[id],technical:{asset_kind:'scene_background'}});
+ const retired=await l.register({...card,kind:'image',title:'淘汰动作',character_ids:[id],technical:{asset_kind:'action_keyposes'}});
+ await l.revise(retired.id,{lifecycle:'retired'},'动作不自然');
+ const found=await l.characterSearch({query:'许小满'});
+ assert.equal(found.characters.length,1); assert.equal(found.characters[0].profile_asset_id,root.id);
+ const current=await l.characterGet(id);
+ assert.equal(current.profile.name,'许小满'); assert.equal(current.selected_voice_asset_id,voice.id); assert.equal(current.profile_asset_id,root.id);
+ const assets=await l.characterAssets({character_id:id});
+ assert.equal(assets.assets.expressions[0].id,expression.id); assert.equal(assets.assets.actions[0].id,action.id); assert.equal(assets.assets.scenes[0].id,scene.id);
+ assert.equal('character_profile' in assets.assets.actions[0].technical,false);
+ assert.equal(assets.assets.actions.some(item=>item.title==='淘汰动作'),false);
+ const withRetired=await l.characterAssets({character_id:id,include_retired:true,categories:['actions']});
+ assert.equal(withRetired.assets.actions.some(item=>item.title==='淘汰动作'),true);
+ assert.equal((await l.characterHistory(id)).current_profile_asset_id,root.id);
+});
+test('ambiguous character profile leaves are surfaced instead of silently selected',async()=>{
+ const l=setup({...principal,legacy_prefix:undefined}),id='ambiguous';
+ const base={...card,kind:'image',character_ids:[id],technical:{asset_kind:'identity_reference',character_profile:{id,name:'分叉角色',version:1}}};
+ const a=await l.register({...base,title:'A'}),b=await l.register({...base,title:'B'});
+ const result=await l.characterSearch({query:'分叉角色'});
+ assert.equal(result.characters[0].profile_asset_id,null); assert.match(result.characters[0].warnings[0],/Multiple active/);
+ await assert.rejects(()=>l.characterGet(id),{status:409});
+ assert.notEqual(a.id,b.id);
+});

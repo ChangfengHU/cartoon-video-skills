@@ -29,6 +29,41 @@ export function clean(value, depth = 0) {
 function requireText(v, key) { assert(typeof v?.[key] === 'string' && v[key].trim().length > 0, `Missing ${key}`); }
 function stringArray(value) { return Array.isArray(value) && value.length > 0 && value.every(x => typeof x === 'string' && x.trim().length > 0); }
 function validDate(value) { return typeof value === 'string' && /^\d{4}-\d\d-\d\d/.test(value) && Number.isFinite(Date.parse(value)); }
+const CHARACTER_CATEGORIES = ['identity_reference','expressions','actions','scenes','voices','sfx','bgm','other'];
+function lifecycle(record) { return record.lifecycle === 'retired' ? 'retired' : 'active'; }
+function assetCategory(record) {
+  const role = String(record.technical?.asset_kind || record.technical?.asset_type || record.technical?.role || '').toLowerCase();
+  if (role.includes('expression')) return 'expressions';
+  if (role.includes('action') || role.includes('pose') || role.includes('motion')) return 'actions';
+  if (role.includes('scene') || role.includes('background')) return 'scenes';
+  if (role.includes('identity') || role.includes('reference')) return 'identity_reference';
+  // Early cards predate asset_kind. A profile card without a more specific
+  // production role is the character identity reference; copied profile
+  // metadata on action/expression revisions is not.
+  if (record.technical?.character_profile && !role) return 'identity_reference';
+  if (record.kind === 'voice') return 'voices';
+  if (record.kind === 'sfx') return 'sfx';
+  if (record.kind === 'bgm') return 'bgm';
+  return 'other';
+}
+function assetSummary(record) {
+  const technical = record.technical || {};
+  // character_get is the one authoritative, full profile payload.  A grouped
+  // asset list must stay small enough for an agent to choose assets rather than
+  // repeat every persona and script prompt once per image.
+  const detail = Object.fromEntries(Object.entries({
+    asset_kind:technical.asset_kind,
+    asset_type:technical.asset_type,
+    role:technical.role,
+    revision:technical.revision,
+    scene:technical.scene,
+    duration_seconds:technical.duration_seconds,
+    voice_id:technical.voice_id,
+    provider:technical.provider,
+    model:technical.model
+  }).filter(([, value]) => value !== undefined));
+  return {id:record.id,title:record.title,kind:record.kind,category:assetCategory(record),lifecycle:lifecycle(record),supersedes:record.supersedes || null,tags:record.tags || [],use_cases:record.use_cases || [],review_status:record.review_status,technical:detail};
+}
 export function validateCard(card, binary = false) {
   clean(card);
   assert(new TextEncoder().encode(canonical(card)).length <= 60000, 'Card too large');
@@ -105,6 +140,92 @@ export class Library {
       return this.load(group, id);
     }));
     return {rows, next_cursor: next ? btoa(JSON.stringify(next)) : null};
+  }
+  async allRecords() {
+    // Character views deliberately do the pagination inside the service.  The
+    // append-only R2 facts stay authoritative; this is a bounded, rebuildable
+    // projection rather than a second editable character database.
+    const rows = [];
+    let cursor;
+    for (let pages = 0; pages < 100; pages += 1) {
+      const page = await this.page('records', cursor, 50);
+      rows.push(...page.rows);
+      if (!page.next_cursor) return rows;
+      cursor = page.next_cursor;
+    }
+    throw new Rejected('Character catalog exceeds bounded rebuild capacity', 503);
+  }
+  async characterCatalog() {
+    const records = await this.allRecords();
+    const successorIds = new Set(records.map(record => record.supersedes).filter(Boolean));
+    const groups = new Map();
+    for (const record of records) {
+      const profile = record.technical?.character_profile;
+      if (!profile || typeof profile.id !== 'string' || !profile.id.trim() || assetCategory(record) !== 'identity_reference') continue;
+      const id = profile.id.trim();
+      const group = groups.get(id) || [];
+      group.push(record);
+      groups.set(id, group);
+    }
+    const characters = [];
+    for (const [character_id, profiles] of groups) {
+      const leaves = profiles.filter(record => !successorIds.has(record.id));
+      const activeLeaves = leaves.filter(record => lifecycle(record) === 'active');
+      const current = activeLeaves.length === 1 ? activeLeaves[0] : null;
+      const warnings = [];
+      if (activeLeaves.length > 1) warnings.push('Multiple active profile revisions have no successor; choose a revision explicitly before production.');
+      if (activeLeaves.length === 0 && leaves.length) warnings.push('No active current profile revision. Use character_history for retired revisions.');
+      if (!leaves.length) warnings.push('No terminal profile revision could be resolved.');
+      characters.push({character_id,profiles,leaves,current,warnings});
+    }
+    return {records,characters};
+  }
+  async characterSearch({query = '', limit = 20} = {}) {
+    assert(typeof query === 'string' && query.length <= 300, 'Invalid character query');
+    assert(Number.isInteger(limit) && limit >= 1 && limit <= 50, 'Invalid character limit');
+    const {characters} = await this.characterCatalog();
+    const words = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
+    const results = characters.map(entry => {
+      const profile = entry.current?.technical?.character_profile || entry.leaves[0]?.technical?.character_profile || {};
+      const version = profile.version ?? profile.profile_version ?? null;
+      return {character_id:entry.character_id,name:profile.name || entry.current?.title || entry.leaves[0]?.title || entry.character_id,profile_asset_id:entry.current?.id || null,profile_version:version,lifecycle:entry.current ? 'active' : 'unresolved',status:entry.current?.technical?.preproduction?.status_label || null,warnings:entry.warnings};
+    }).filter(result => words.every(word => JSON.stringify([result.character_id,result.name,result.status]).toLowerCase().includes(word)));
+    return {characters:results.slice(0,limit),total:results.length,note:'Character views resolve current profiles across the private R2 catalog. Use character_get by character_id; asset_search remains paginated discovery for individual assets.'};
+  }
+  async characterGet(characterId) {
+    assert(typeof characterId === 'string' && characterId.trim().length > 0 && characterId.length <= 200, 'Invalid character ID');
+    const {characters,records} = await this.characterCatalog();
+    const entry = characters.find(character => character.character_id === characterId);
+    assert(entry, 'Character not found', 404);
+    assert(entry.current, entry.warnings[0] || 'Current character profile cannot be resolved', 409);
+    const profile = entry.current.technical?.character_profile || {};
+    const linkedSceneIds = Object.values(entry.current.technical?.scene_assets || {}).filter(value => typeof value === 'string');
+    const selectedVoiceId = entry.current.technical?.voice_recommendation?.voice_id || null;
+    const selectedVoice = selectedVoiceId ? records.find(record => record.kind === 'voice' && record.technical?.voice_id === selectedVoiceId && lifecycle(record) === 'active') : null;
+    return {character_id:entry.character_id,profile_asset_id:entry.current.id,profile_version:profile.version ?? profile.profile_version ?? null,lifecycle:lifecycle(entry.current),profile,voice_recommendation:entry.current.technical?.voice_recommendation || null,selected_voice_asset_id:selectedVoice?.id || null,scene_asset_ids:linkedSceneIds,preproduction:entry.current.technical?.preproduction || null,warnings:entry.warnings,note:'This is the current private character configuration. Retrieve grouped production media with character_assets and authenticated file access through asset_get.'};
+  }
+  async characterAssets({character_id, categories, include_retired = false} = {}) {
+    assert(typeof character_id === 'string' && character_id.trim().length > 0 && character_id.length <= 200, 'Invalid character ID');
+    assert(categories === undefined || (Array.isArray(categories) && categories.length <= CHARACTER_CATEGORIES.length && categories.every(category => CHARACTER_CATEGORIES.includes(category))), 'Invalid character asset categories');
+    assert(typeof include_retired === 'boolean', 'Invalid include_retired');
+    const {characters,records} = await this.characterCatalog();
+    const entry = characters.find(character => character.character_id === character_id);
+    assert(entry, 'Character not found', 404);
+    assert(entry.current, entry.warnings[0] || 'Current character profile cannot be resolved', 409);
+    const successors = new Set(records.map(record => record.supersedes).filter(Boolean));
+    const matching = records.filter(record => (record.character_ids || []).includes(character_id));
+    const terminal = matching.filter(record => !successors.has(record.id));
+    const selected = terminal.filter(record => (include_retired || lifecycle(record) !== 'retired') && (!categories || categories.includes(assetCategory(record))));
+    const grouped = Object.fromEntries(CHARACTER_CATEGORIES.map(category => [category, []]));
+    for (const record of selected) grouped[assetCategory(record)].push(assetSummary(record));
+    return {character_id,profile_asset_id:entry.current.id,include_retired,categories:categories || CHARACTER_CATEGORIES,assets:grouped,warnings:entry.warnings,note:'Only terminal revisions are returned. Retired assets are omitted unless include_retired is true; use character_history to inspect profile revisions.'};
+  }
+  async characterHistory(characterId) {
+    assert(typeof characterId === 'string' && characterId.trim().length > 0 && characterId.length <= 200, 'Invalid character ID');
+    const {characters} = await this.characterCatalog();
+    const entry = characters.find(character => character.character_id === characterId);
+    assert(entry, 'Character not found', 404);
+    return {character_id:characterId,current_profile_asset_id:entry.current?.id || null,warnings:entry.warnings,revisions:entry.profiles.map(record => ({id:record.id,title:record.title,lifecycle:lifecycle(record),supersedes:record.supersedes || null,profile_version:record.technical?.character_profile?.version ?? record.technical?.character_profile?.profile_version ?? null,revision_reason:record.revision_reason || null})),note:'History is immutable and may include retired revisions. Do not select a historical profile for a new production without an explicit reason.'};
   }
   async search({query = '', kind, cursor, limit = 40, tags_all = [], character_id, license_status, archive_allowed, bpm_min, bpm_max} = {}) {
     assert(Array.isArray(tags_all) && tags_all.length <= 20 && tags_all.every(t => typeof t === 'string'), 'Invalid tags filter');
