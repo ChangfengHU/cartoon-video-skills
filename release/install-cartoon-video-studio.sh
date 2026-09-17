@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Reviewed release source. It never prints the bootstrap token or provider keys.
 set -euo pipefail
-STUDIO_VERSION=0.7.4; NODE_VERSION=22.18.0; HYPERFRAMES_VERSION=0.8.33; GSAP_VERSION=3.14.2; MCP_REMOTE_VERSION=0.14.2
+STUDIO_VERSION=0.7.5; NODE_VERSION=22.18.0; HYPERFRAMES_VERSION=0.8.33; GSAP_VERSION=3.14.2; MCP_REMOTE_VERSION=0.14.2
 MODE=auto; REPAIR=0; TOKEN=""; RUNTIME_DIR="${VYIBC_STUDIO_RUNTIME_DIR:-$HOME/.local/share/vyibc/cartoon-video-studio/runtime}"; STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/vyibc/cartoon-video-studio"; BRIDGE_BASE="${VYIBC_PLUGIN_BRIDGE_BASE:-https://fleet.vyibc.com/api/hub/plugin-bootstrap/mcp}"
 usage(){ echo 'Usage: install-cartoon-video-studio.sh --bootstrap-token TOKEN [--runtime auto|check|skip] [--repair] [--runtime-dir DIR]' >&2; }
 while [[ $# -gt 0 ]]; do case "$1" in --bootstrap-token) TOKEN="${2:-}";shift 2;;--runtime) MODE="${2:-}";shift 2;;--repair) REPAIR=1;shift;;--runtime-dir) RUNTIME_DIR="${2:-}";shift 2;;-h|--help) usage;exit 0;;*) usage;exit 64;;esac;done
@@ -43,7 +43,7 @@ chmod 700 "$AUTH_FILE";printf %s "$TOKEN" >"$STATE_DIR/bridge.token";chmod 600 "
 python3 - "$BRIDGE_BASE" "$TOKEN" "$AUTH_FILE" "$REPAIR" <<'PY'
 import json,subprocess,sys,urllib.request
 base,token,auth,repair=sys.argv[1].rstrip('/'),sys.argv[2],sys.argv[3],sys.argv[4]=='1'
-names=['vyibc-cartoon-assets','vyibc-image','vyibc-douyin','vyibc-youtube','vyibc-voice','vyibc-behavior','vyibc-xiaohongshu','vyibc-vault']
+servers=['vyibc-cartoon-assets','vyibc-image','vyibc-douyin','vyibc-youtube','vyibc-voice','vyibc-behavior','vyibc-xiaohongshu','vyibc-vault']
 def call(url,i,method,params=None):
  req=urllib.request.Request(url,data=json.dumps({'jsonrpc':'2.0','id':i,'method':method,'params':params or {}}).encode(),headers={'content-type':'application/json','accept':'application/json, text/event-stream','authorization':'Bearer '+token})
  with urllib.request.urlopen(req,timeout=30) as response: raw=response.read().decode();ctype=response.headers.get('content-type','')
@@ -52,8 +52,8 @@ def call(url,i,method,params=None):
   for line in event.splitlines():
    if line.startswith('data:') and (packet:=json.loads(line[5:].lstrip())).get('id')==i:return packet
  raise RuntimeError('MCP returned no matching response')
-for i,name in enumerate(names,1):
- url=base+'/'+name;init=call(url,i*10,'initialize',{'protocolVersion':'2025-06-18','capabilities':{},'clientInfo':{'name':'cartoon-bootstrap','version':'0.7.4'}})
+for i,name in enumerate(servers,1):
+ url=base+'/'+name;init=call(url,i*10,'initialize',{'protocolVersion':'2025-06-18','capabilities':{},'clientInfo':{'name':'cartoon-bootstrap','version':'0.7.5'}})
  if 'error' in init:raise SystemExit(name+': initialize failed')
  tools=call(url,i*10+1,'tools/list').get('result',{}).get('tools',[]);old=subprocess.run(['codex','mcp','get',name,'--json'],capture_output=True,text=True)
  if old.returncode==0:
