@@ -46,11 +46,11 @@ $ARGUMENTS
 
 新角色遵循当前私有 voice_policy，不把收藏音色当成默认；用户本次显式选声优先，授权状态仍须核对。保留认可版本中适用的画面/声音范围，不将本次好评升级成全局认可。
 
-视频交付沿用工作室要求：真实MP4、完整剧本与分镜、素材/音频清单、PUBLICATION、QA、实际截图/连续动作采样及复现工程。release_check.py 是证据检查，不是美感评分；实际成片修改后，旧哈希绑定的通过记录失效。候选作品明确标注未验证项，阻断问题未解决不进入发布。不得在没有工具回执时声称已上传R2、已入库、已更新Fleet或已发布。
+视频交付沿用工作室要求：真实MP4、完整剧本与分镜、素材/音频清单、PUBLICATION、QA、实际截图/连续动作采样及复现工程。默认执行两阶段：第一阶段将实际MP4上传 R2，交付可访问预览地址、文件哈希和待审项；用户可要求修改或明确指定该版本发布。第二阶段才允许调用抖音发布。R2 地址、发布文案草案、MCP 连接或自动化配置都不是发布授权；改版后以新的 R2 地址和哈希重新进入第一阶段。release_check.py 是证据检查，不是美感评分；实际成片修改后，旧哈希绑定的通过记录失效。候选作品明确标注未验证项，阻断问题未解决不进入发布。不得在没有工具回执时声称已上传R2、已入库、已更新Fleet或已发布。
 
 音乐按故事重新选，发布文案不堆制作信息；必要署名与许可沿用工作室规范。默认制作和角色命令都不包含社交发布授权。
 
-发布分支须按 cartoon-video-studio/references/publishing.md 提供 characterIds、studioTaskId、sourceSha256，检查 registration 并读回角色/任务已发布列表。平台发布成功但登记失败，只用 register_published_video 补登记，禁止重复发布。
+发布分支须按 cartoon-video-studio/references/publishing.md 提供 characterIds、studioTaskId、sourceSha256，检查 registration 并读回角色/任务已发布列表。仅用户明确授权发布该 `sourceSha256` 对应版本，或直接调用 `studio-publish`，才可进入该分支。平台发布成功但登记失败，只用 register_published_video 补登记，禁止重复发布。
 
 # 指令帮助
 
