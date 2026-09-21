@@ -29,6 +29,8 @@ description: 视频工作室统一入口，根据话题、素材和用户要求�
 
 ## 共用制作能力
 
+迁移到新平台、新机器或需要延续已认可作品质量时，读取 [平台内制作与质量延续](references/portable-production.md)：核对当前会话执行环境、实际图像链路和持久工程，再验证分层表演与实际成片；不能用安装成功或外部代跑证明平台能力。
+
 视频从 [HyperFrames](../hyperframes/SKILL.md) 进入，复杂卡通执行 [general-video](../general-video/SKILL.md)。结构、动画、镜头、混音、CLI与media-use均随包提供；二进制运行环境、TTS账户和远端服务授权不随安装自动获得。
 
 配音先读 [配音制作](../voice-production/SKILL.md)：支持豆包MCP配音，以及已授权Cosy音色的独立HTTP适配器；私人称呼经resolve_voice解析，不能默认绑定到某角色。
