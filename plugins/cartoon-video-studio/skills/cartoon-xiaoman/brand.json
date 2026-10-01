@@ -1,0 +1,17 @@
+{
+  "brand_id": "cartoon-xuman-v1",
+  "approval": "user approved nine-grid reference and sweet peach voice (zh_female_tianmeitaozi_uranus_bigtts)",
+  "voice": {
+    "speaker": "zh_female_tianmeitaozi_uranus_bigtts",
+    "resource_id": "seed-tts-2.0",
+    "display_name": "甜美桃子 2.0",
+    "clone": false
+  },
+  "assets": [
+    {
+      "path": "assets/heroine-sheet-v1.png",
+      "sha256": "fe855ddd0a0f4f1ebf1af8e0cc8e4e238dda127b570ef2011f72a5566c6d98be",
+      "source": "https://cdn.vyibc.com/studio-characters/xuman-campus-v1/fe855ddd0a0f/xuman-nine-grid-v1.png"
+    }
+  ]
+}

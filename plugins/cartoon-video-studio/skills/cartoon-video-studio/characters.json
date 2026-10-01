@@ -27,6 +27,19 @@
       ],
       "approval": "user overall satisfied with full reference; later versions require QA",
       "profileFile": "character-profile.json"
+    },
+    {
+      "id": "xiaoman",
+      "name": "许小满",
+      "skill": "cartoon-xiaoman",
+      "brandFile": "brand.json",
+      "visualStyle": "warm-paper-ink",
+      "storyForms": [
+        "校园生活喜剧",
+        "反转故事"
+      ],
+      "approval": "user approved nine-grid reference and sweet peach voice (zh_female_tianmeitaozi_uranus_bigtts)",
+      "profileFile": "character-profile.json"
     }
   ]
 }

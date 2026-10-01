@@ -46,6 +46,17 @@
       "defaults": "research_topic"
     },
     {
+      "name": "studio-xiaoman",
+      "description": "许小满：校园生活、内心热闹与反差喜剧",
+      "argument_hint": "[主题；留空主动研究选题]",
+      "mode": "character",
+      "character_name": "许小满",
+      "codex": "$studio-xiaoman",
+      "slash": "/studio-xiaoman",
+      "legacy": "/prompts:studio-xiaoman",
+      "defaults": "research_topic"
+    },
+    {
       "name": "studio-new",
       "description": "新角色：真实参考、设计、选声并制作视频",
       "argument_hint": "[抖音喜欢/小红书/参考图/主题；可只设计角色]",

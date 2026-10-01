@@ -8,6 +8,8 @@ node_modules/
 private/
 **/*.wav
 **/*.mp3
+!skills/media-use/audio/assets/sfx/*.mp3
+!plugins/cartoon-video-studio/skills/media-use/audio/assets/sfx/*.mp3
 **/*.npz
 **/*.MOV
 **/*.mp4
