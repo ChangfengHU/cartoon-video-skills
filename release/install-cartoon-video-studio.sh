@@ -8,7 +8,7 @@ NODE_VERSION=22.18.0
 HYPERFRAMES_VERSION=0.8.33
 GSAP_VERSION=3.14.2
 
-MODE=auto; REPAIR=0; TOKEN=""
+MODE=skip; REPAIR=0; TOKEN=""
 RUNTIME_DIR="${VYIBC_STUDIO_RUNTIME_DIR:-$HOME/.local/share/vyibc/cartoon-video-studio/runtime}"
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/vyibc/cartoon-video-studio"
 
