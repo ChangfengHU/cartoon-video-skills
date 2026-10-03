@@ -23,26 +23,62 @@ while [[ $# -gt 0 ]]; do case "$1" in
 esac; done
 [[ -n "$TOKEN" && "$MODE" =~ ^(auto|check|skip)$ ]] || { usage; exit 64; }
 
-# ━━ 识别目标环境 ━━
+# ━━ 识别目标环境 (交互式) ━━
 if [[ "$TARGET" == "auto" ]]; then
-  if command -v codex >/dev/null; then TARGET="codex"
-  elif [[ -d "$HOME/.claude/skills" ]]; then TARGET="claude"
-  elif [[ -d "$HOME/.cursor/skills" ]]; then TARGET="cursor"
-  elif [[ -d "$HOME/.gemini/antigravity/skills" ]]; then TARGET="antigravity"
-  elif [[ -d "$HOME/.gemini/skills" ]]; then TARGET="gemini"
-  else TARGET="codex" # Fallback
+  echo ""
+  echo "🛠  检测到未指定安装目标，请选择将 Cartoon Video Studio 安装到哪个 AI 工具："
+  echo ""
+  
+  options=("codex" "cursor" "claude" "gemini" "antigravity" "copilot" "openclaw" "agents" "hermes" "全部安装(all)")
+  paths=("~/.codex/skills/" "~/.cursor/skills/" "~/.claude/skills/" "~/.gemini/skills/" "~/.gemini/antigravity/skills/" "~/.copilot/skills/" "~/.openclaw/workspace/skills/" "~/.agents/skills/" "~/.hermes/skills/devops/" "以上所有")
+  
+  for i in "${!options[@]}"; do
+    printf "  %2d) %-15s (%s)\n" "$((i+1))" "${options[$i]}" "${paths[$i]}"
+  done
+  echo ""
+  
+  if [ -t 0 ]; then
+    # 只有在真正的 TTY 终端下才要求输入
+    read -rp "请输入编号 [1-10] (默认 1): " CHOICE
+    case "$CHOICE" in
+      1|"") TARGET="codex"       ;;
+      2) TARGET="cursor"      ;;
+      3) TARGET="claude"      ;;
+      4) TARGET="gemini"      ;;
+      5) TARGET="antigravity" ;;
+      6) TARGET="copilot"     ;;
+      7) TARGET="openclaw"    ;;
+      8) TARGET="agents"      ;;
+      9) TARGET="hermes"      ;;
+     10) TARGET="all"         ;;
+      *) echo "❌ 无效选项，默认使用 codex"; TARGET="codex" ;;
+    esac
+  else
+    # CI/CD 等非交互环境自动回退到 codex
+    TARGET="codex"
   fi
 fi
 
-SKILL_BASE_DIR=""
-case "$TARGET" in
-  codex)       SKILL_BASE_DIR="$HOME/.codex/skills" ;;
-  claude)      SKILL_BASE_DIR="$HOME/.claude/skills" ;;
-  cursor)      SKILL_BASE_DIR="$HOME/.cursor/skills" ;;
-  gemini)      SKILL_BASE_DIR="$HOME/.gemini/skills" ;;
-  antigravity) SKILL_BASE_DIR="$HOME/.gemini/antigravity/skills" ;;
-  *)           SKILL_BASE_DIR="$HOME/.agents/skills" ;;
-esac
+TARGET_LIST=()
+if [[ "$TARGET" == "all" ]]; then
+  TARGET_LIST=("codex" "cursor" "claude" "gemini" "antigravity" "copilot" "openclaw" "agents" "hermes")
+else
+  TARGET_LIST=("$TARGET")
+fi
+
+get_skill_dir() {
+  case "$1" in
+    codex)       echo "$HOME/.codex/skills" ;;
+    cursor)      echo "$HOME/.cursor/skills" ;;
+    claude)      echo "$HOME/.claude/skills" ;;
+    gemini)      echo "$HOME/.gemini/skills" ;;
+    antigravity) echo "$HOME/.gemini/antigravity/skills" ;;
+    copilot)     echo "$HOME/.copilot/skills" ;;
+    openclaw)    echo "$HOME/.openclaw/workspace/skills" ;;
+    hermes)      echo "$HOME/.hermes/skills/devops" ;;
+    *)           echo "$HOME/.agents/skills" ;;
+  esac
+}
 
 for cmd in curl python3; do
   command -v "$cmd" >/dev/null || { echo "Missing: $cmd" >&2; exit 69; }
@@ -91,28 +127,42 @@ fi
 echo "✓ Runtime"
 
 # ━━ 第二步：Skills 分发 ━━
-if [[ "$TARGET" == "codex" && "$HAVE_CODEX" -eq 1 ]]; then
-  if ! codex plugin marketplace list 2>/dev/null|awk "NR>1{print \$1}"|grep -qx personal 2>/dev/null; then
-    codex plugin marketplace add ChangfengHU/cartoon-video-skills 2>/dev/null || true
-  else
-    codex plugin marketplace upgrade personal 2>/dev/null || true
-  fi
-  timeout 30 codex plugin list 2>/dev/null|awk "NR>1{print \$1}"|grep -qx "cartoon-video-studio@personal" 2>/dev/null \
-    || timeout 30 codex plugin add cartoon-video-studio@personal 2>/dev/null || true
-  echo "✓ Skills (via codex plugin)"
-else
-  echo "  Downloading skills for $TARGET..."
+# 提取是否需要下载源码包（如果目标不全是 codex，就需要下载）
+NEED_DOWNLOAD=0
+for t in "${TARGET_LIST[@]}"; do
+  if [[ "$t" != "codex" ]]; then NEED_DOWNLOAD=1; break; fi
+done
+
+if [[ "$NEED_DOWNLOAD" -eq 1 ]]; then
+  echo "  Downloading skills archive..."
   REPO_URL="https://github.com/ChangfengHU/cartoon-video-skills/archive/refs/heads/main.tar.gz"
   curl -fsSL "$REPO_URL" -o "$TMP/skills.tar.gz" 2>/dev/null || { echo "  ⚠ Failed to download skills archive" >&2; }
   if [[ -f "$TMP/skills.tar.gz" ]]; then
     tar -xzf "$TMP/skills.tar.gz" -C "$TMP/"
-    mkdir -p "$SKILL_BASE_DIR"
-    if [[ -d "$TMP/cartoon-video-skills-main/plugins/cartoon-video-studio/skills" ]]; then
-      cp -R "$TMP/cartoon-video-skills-main/plugins/cartoon-video-studio/skills/"* "$SKILL_BASE_DIR/"
-      echo "✓ Skills installed to $SKILL_BASE_DIR"
-    fi
   fi
 fi
+
+for CURRENT_TARGET in "${TARGET_LIST[@]}"; do
+  echo "  ➤ Installing to $CURRENT_TARGET..."
+  if [[ "$CURRENT_TARGET" == "codex" && "$HAVE_CODEX" -eq 1 ]]; then
+    if ! codex plugin marketplace list 2>/dev/null|awk "NR>1{print \$1}"|grep -qx personal 2>/dev/null; then
+      codex plugin marketplace add ChangfengHU/cartoon-video-skills 2>/dev/null || true
+    else
+      codex plugin marketplace upgrade personal 2>/dev/null || true
+    fi
+    timeout 30 codex plugin list 2>/dev/null|awk "NR>1{print \$1}"|grep -qx "cartoon-video-studio@personal" 2>/dev/null \
+      || timeout 30 codex plugin add cartoon-video-studio@personal 2>/dev/null || true
+    echo "    ✓ Skills installed (via codex plugin)"
+  else
+    SKILL_DIR=$(get_skill_dir "$CURRENT_TARGET")
+    if [[ -d "$TMP/cartoon-video-skills-main/plugins/cartoon-video-studio/skills" ]]; then
+      mkdir -p "$SKILL_DIR"
+      cp -R "$TMP/cartoon-video-skills-main/plugins/cartoon-video-studio/skills/"* "$SKILL_DIR/"
+      echo "    ✓ Skills copied to $SKILL_DIR"
+    fi
+  fi
+done
+
 
 # ━━ 第三步：MCP 配置 ━━
 printf "%s" "$TOKEN" >"$STATE_DIR/bridge.token"; chmod 600 "$STATE_DIR/bridge.token"
