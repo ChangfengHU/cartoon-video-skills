@@ -60,7 +60,7 @@ if [[ "$MODE" != skip ]]; then
       echo '  Installing FFmpeg + Chinese fonts...'
       if [[ "${EUID:-$(id -u)}" -eq 0 ]];then apt-get update&&apt-get install -y ffmpeg fontconfig fonts-noto-cjk unzip
       elif command -v sudo >/dev/null;then sudo apt-get update&&sudo apt-get install -y ffmpeg fontconfig fonts-noto-cjk unzip; fi
-    else echo 'FFmpeg missing.' >&2;exit 69; fi
+    else echo '  ⚠ FFmpeg is missing. Rendering requires it (e.g. brew install ffmpeg).' >&2; fi
   fi
   [[ -f "$RUNTIME_DIR/package.json" ]]||printf '{"private":true}\n' >"$RUNTIME_DIR/package.json"
   "$npm_bin" --prefix "$RUNTIME_DIR" install --ignore-scripts --no-audit --no-fund --save-exact "hyperframes@$HYPERFRAMES_VERSION" "gsap@$GSAP_VERSION"
@@ -178,7 +178,7 @@ if [[ "$MODE" != skip ]]; then
   HYPERFRAMES_SKIP_SKILLS=1 "$HF" init "$SMOKE" --non-interactive --example blank --resolution portrait >/dev/null
   python3 -c "import pathlib;p=pathlib.Path('$SMOKE/index.html');s=p.read_text();p.write_text(s.replace('data-duration=\"10\"','data-duration=\"3\"',1))"
   (cd "$SMOKE" && HYPERFRAMES_SKIP_SKILLS=1 "$HF" check >/dev/null && "$HF" render --fps 30 --quality draft --workers 1 --output "$TMP/smoke.mp4" >/dev/null)
-  ffmpeg -nostdin -y -i "$TMP/smoke.mp4" -f lavfi -i anullsrc=r=48000:cl=stereo -shortest -c:v copy -c:a aac "$TMP/smoke-aac.mp4" >/dev/null 2>&1
+  command -v ffmpeg >/dev/null && ffmpeg -nostdin -y -i "$TMP/smoke.mp4" -f lavfi -i anullsrc=r=48000:cl=stereo -shortest -c:v copy -c:a aac "$TMP/smoke-aac.mp4" >/dev/null 2>&1
   python3 -c "
 import json,subprocess
 d=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_entries','format=duration:stream=codec_name,width,height,r_frame_rate','-of','json','$TMP/smoke-aac.mp4']))
