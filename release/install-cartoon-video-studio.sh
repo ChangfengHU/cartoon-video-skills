@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# cartoon-video-studio plugin installer v0.9.0
+# cartoon-video-studio plugin installer v0.9.1
 # Cross-Platform / Any-Agent support: Auto-detects Codex, Claude, Gemini, Cursor
 set -euo pipefail
 
-STUDIO_VERSION=0.9.0
+STUDIO_VERSION=0.9.1
 NODE_VERSION=22.18.0
 HYPERFRAMES_VERSION=0.8.33
 GSAP_VERSION=3.14.2
@@ -117,7 +117,7 @@ fi
 # ━━ 第三步：MCP 配置 ━━
 printf "%s" "$TOKEN" >"$STATE_DIR/bridge.token"; chmod 600 "$STATE_DIR/bridge.token"
 
-python3 - "$TOKEN" "$STATE_DIR" "$REPAIR" "$HAVE_CODEX" "$TARGET" <<'PY'
+python3 - "$TOKEN" "$STATE_DIR" "$REPAIR" "$HAVE_CODEX" "$TARGET" << "PY_EOF"
 import json, os, subprocess, sys, urllib.request
 
 token       = sys.argv[1]
@@ -176,27 +176,13 @@ else:
     with open(os.open(mcp_json, os.O_WRONLY|os.O_CREAT|os.O_TRUNC, 0o600), "w") as f:
         json.dump({"mcpServers": servers}, f, indent=2, ensure_ascii=False)
     print(f"  MCP config written to: {mcp_json}")
-    
-    # 针对 Claude 的特别注入 (claude_desktop_config.json)
-    if target == "claude" and sys.platform.startswith("darwin"):
-        claude_cfg = os.path.expanduser("~/Library/Application Support/Claude/claude_desktop_config.json")
-        if os.path.exists(os.path.dirname(claude_cfg)):
-            try:
-                cdata = json.load(open(claude_cfg)) if os.path.exists(claude_cfg) else {"mcpServers":{}}
-                if "mcpServers" not in cdata: cdata["mcpServers"] = {}
-                for name, cfg in servers.items():
-                    # Claude desktop only supports stdio currently, HTTP requires an SSE bridge script.
-                    # Since this installer configures HTTP MCPs, we warn the user or inject a bridge.
-                    pass
-                print("  ℹ Note: Claude Desktop requires SSE bridge for HTTP MCPs. See docs.")
-            except Exception: pass
 
 env_sh = os.path.join(state_dir, "mcp-env.sh")
 with open(os.open(env_sh, os.O_WRONLY|os.O_CREAT|os.O_TRUNC, 0o600), "w") as f:
     f.write("# Auto-generated. Source this file.\n")
     for k, v in env_vars.items():
         f.write(f"export {k}=\"{v}\"\n")
-'PY'
+PY_EOF
 echo "✓ MCP"
 
 # ━━ 第四步：冒烟测试 ━━
@@ -204,21 +190,23 @@ if [[ "$MODE" != skip ]]; then
   HF="$RUNTIME_DIR/node_modules/.bin/hyperframes";[[ -x "$HF" ]]||{ echo "HyperFrames missing." >&2;exit 69; }
   SMOKE="$TMP/smoke"
   HYPERFRAMES_SKIP_SKILLS=1 "$HF" init "$SMOKE" --non-interactive --example blank --resolution portrait >/dev/null
-  command -v ffmpeg >/dev/null && (
+  command -v ffmpeg >/dev/null 2>&1 && (
     cd "$SMOKE" && "$HF" render --fps 30 --quality draft --workers 1 --output "$TMP/smoke.mp4" >/dev/null
     ffmpeg -nostdin -y -i "$TMP/smoke.mp4" -f lavfi -i anullsrc=r=48000:cl=stereo -shortest -c:v copy -c:a aac "$TMP/smoke-aac.mp4" >/dev/null 2>&1
   ) || true
   echo "✓ Smoke test (skip rendering if no ffmpeg)"
 fi
 
-python3 -c '
-import datetime,json,pathlib
-pathlib.Path("'$STATE_DIR'/install-receipt.json").write_text(json.dumps({
+python3 - "$STATE_DIR" "$STUDIO_VERSION" "$TARGET" "$MODE" << "PY_RECEIPT_EOF"
+import datetime,json,pathlib,sys
+state_dir, studio_version, target, mode = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+pathlib.Path(state_dir + "/install-receipt.json").write_text(json.dumps({
  "schema":"cartoon-video-studio-install-receipt/v1", "status":"ready",
- "studio_version":"'$STUDIO_VERSION'", "target":"'$TARGET'",
- "runtime_mode":"'$MODE'",
+ "studio_version":studio_version, "target":target,
+ "runtime_mode":mode,
  "written_at":datetime.datetime.now(datetime.timezone.utc).isoformat()
-},ensure_ascii=False,indent=2)+"\n")'
+},ensure_ascii=False,indent=2)+"\n")
+PY_RECEIPT_EOF
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
