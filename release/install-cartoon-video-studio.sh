@@ -211,14 +211,14 @@ if [[ "$MODE" != skip ]]; then
   echo "✓ Smoke test (skip rendering if no ffmpeg)"
 fi
 
-python3 -c "
+python3 -c '
 import datetime,json,pathlib
-pathlib.Path(/install-receipt.json).write_text(json.dumps({
- schema:cartoon-video-studio-install-receipt/v1,status:ready,
- studio_version:,target:,
- runtime_mode:,
- written_at:datetime.datetime.now(datetime.timezone.utc).isoformat()
-},ensure_ascii=False,indent=2)+n)"
+pathlib.Path("'$STATE_DIR'/install-receipt.json").write_text(json.dumps({
+ "schema":"cartoon-video-studio-install-receipt/v1", "status":"ready",
+ "studio_version":"'$STUDIO_VERSION'", "target":"'$TARGET'",
+ "runtime_mode":"'$MODE'",
+ "written_at":datetime.datetime.now(datetime.timezone.utc).isoformat()
+},ensure_ascii=False,indent=2)+"\n")'
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
