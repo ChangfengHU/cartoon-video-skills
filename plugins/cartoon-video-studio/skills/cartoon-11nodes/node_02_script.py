@@ -59,7 +59,7 @@ def main():
 
 严格要求：
 1. 必须总共恰好12幕。
-2. 每幕 dialogue 必须精炼口语化、纯正自嘲嘴替，字数严格在 14 到 22 字之间！绝不要书面语！
+2. 每幕 dialogue 必须是生活自嘲长句，字数严格在 20 到 30 字之间！必须带有语气停顿符（……、，），禁止短于20个字！
 3. 每幕需输出条漫视觉要素：
    - act_tag: 左上角时空阶段标签（如 "周六 · 09:30", "衣柜前 · 10:15", "网购中 · 14:00", "周日 · 快递进门", "顿悟 · 20:00"）
    - headline: 顶部场景大标题，极具冲击力（如 "今天，必须断舍离", "这衣服，还能当睡衣", "反向消费，买它！", "房子满了，我也空了"）
@@ -75,7 +75,7 @@ def main():
   "scenes": [
     {{
       "scene_id": 1,
-      "dialogue": "台词内容(14-22字)",
+      "dialogue": "周六早晨九点半，我从床上爬起来……看着乱糟糟的客厅，立誓必须彻底断舍离！",
       "act_tag": "周六 · 09:30",
       "headline": "今天，必须断舍离",
       "stamp_text": "[立誓极简]",
@@ -92,6 +92,9 @@ def main():
         scenes = data.get("scenes", [])
         if len(scenes) < 10:
             raise ValueError("Too few scenes")
+        for sc in scenes:
+            if len(sc.get("dialogue", "")) < 16:
+                raise ValueError(f"Dialogue too short from LLM: {sc.get('dialogue')}")
     except Exception as e:
         print(f"Fallback script generation due to: {e}")
         scenes = [

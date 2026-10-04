@@ -236,32 +236,40 @@ def render_single_scene_av(rec, sb, clips_dir, frames_dir, segs_dir):
     if not voice_path.exists():
         voice_path = clips_dir / f"scene_{sc_id}.mp3"
 
-    scene_audio = segs_dir / f"scene_{sc_id:02d}_audio.mp3"
+    scene_audio = segs_dir / f"scene_{sc_id:02d}_audio.mp4"
     sfx_cue = sb.get("sfx_cue", rec.get("sfx_cue", "pop"))
     sfx_file = f"{sfx_cue}.mp3" if not str(sfx_cue).endswith(".mp3") else str(sfx_cue)
     sfx_path = SFX_DIR / sfx_file
     if not sfx_path.exists():
         sfx_path = SFX_DIR / "pop.mp3"
 
-    # Mix voice + SFX with normalize=0 to maintain full vocal power & punchy SFX
+    # Mix voice + SFX with strict 48000Hz stereo format and limiter to avoid clipping
     if sfx_path and sfx_path.exists():
         delay_ms = int(dur_a * 1000)
-        filter_complex = f"[1:a]adelay={delay_ms}|{delay_ms},volume=0.9[sfx];[0:a][sfx]amix=inputs=2:weights=1 0.9:normalize=0:duration=first[a]"
+        filter_complex = (
+            f"[0:a]aformat=sample_rates=48000:channel_layouts=stereo,volume=1.0[v];"
+            f"[1:a]adelay={delay_ms}|{delay_ms},aformat=sample_rates=48000:channel_layouts=stereo,volume=0.35[sfx];"
+            f"[v][sfx]amix=inputs=2:weights=1 1:normalize=0:duration=first,alimiter=limit=0.95[a]"
+        )
         subprocess.run([
             "ffmpeg", "-y", "-i", str(voice_path), "-i", str(sfx_path),
             "-filter_complex", filter_complex, "-map", "[a]",
-            "-c:a", "libmp3lame", "-b:a", "192k",
+            "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2",
             str(scene_audio)
         ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     else:
-        # Just use voice
-        scene_audio = voice_path
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(voice_path),
+            "-af", "aformat=sample_rates=48000:channel_layouts=stereo",
+            "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2",
+            str(scene_audio)
+        ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-    # Mux scene video and audio into scene_XX_av.mp4
+    # Mux scene video and audio into scene_XX_av.mp4 with clean stream copy
     scene_av = segs_dir / f"scene_{sc_id:02d}_av.mp4"
     subprocess.run([
         "ffmpeg", "-y", "-i", str(scene_video), "-i", str(scene_audio),
-        "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest",
+        "-c:v", "copy", "-c:a", "copy", "-shortest",
         str(scene_av)
     ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
@@ -348,22 +356,22 @@ def main():
 
     if BGM_FILE.exists():
         filter_complex = (
-            f"[0:a]volume=1.0[voice];"
-            f"[1:a]aloop=loop=-1:size=2e+09,atrim=0:{total_dur},volume=0.12[bgm];"
-            f"[voice][bgm]amix=inputs=2:weights=1 0.15:normalize=0:duration=first:dropout_transition=2,"
-            f"loudnorm=I=-16:TP=-1.5:LRA=9[a]"
+            f"[0:a]aformat=sample_rates=48000:channel_layouts=stereo,volume=1.0[voice];"
+            f"[1:a]aloop=loop=-1:size=2e+09,atrim=0:{total_dur},aformat=sample_rates=48000:channel_layouts=stereo,volume=0.10[bgm];"
+            f"[voice][bgm]amix=inputs=2:weights=1 1:normalize=0:duration=first:dropout_transition=2,"
+            f"alimiter=limit=0.95,loudnorm=I=-16:TP=-1.5:LRA=9[a]"
         )
         cmd_mix = [
             "ffmpeg", "-y", "-i", str(video_with_voice), "-i", str(BGM_FILE),
             "-filter_complex", filter_complex,
             "-map", "0:v", "-map", "[a]",
-            "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
+            "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2",
             str(final_output)
         ]
     else:
         cmd_mix = [
             "ffmpeg", "-y", "-i", str(video_with_voice),
-            "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
+            "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2",
             str(final_output)
         ]
 

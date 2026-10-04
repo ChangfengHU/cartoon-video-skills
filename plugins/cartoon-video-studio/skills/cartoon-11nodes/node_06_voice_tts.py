@@ -69,6 +69,9 @@ def synthesize_one_scene(sc, clips_dir):
             "voice": COSY_VOICE_ID,
             "format": "mp3",
             "sample_rate": 24000
+        },
+        "parameters": {
+            "rate": 0.85
         }
     }
     if instruction:

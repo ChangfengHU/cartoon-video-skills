@@ -23,6 +23,10 @@ def main():
         if not txt:
             raise ValueError(f"Empty dialogue in scene {s.get('scene_id')}")
 
+    total_chars = sum(len(s.get("dialogue", "").strip()) for s in scenes)
+    if total_chars < 180:
+        raise ValueError(f"Total dialogue characters too low: {total_chars} (min 180 characters required for 80s target)")
+
     receipt = {
         "status": "passed",
         "scene_count": len(scenes),
