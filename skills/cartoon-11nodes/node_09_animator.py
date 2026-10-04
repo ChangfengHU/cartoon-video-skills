@@ -12,6 +12,7 @@ from common import init_node_context, find_upstream_artifact, write_manifest
 
 SKILL_DIR = Path("/home/claude/agent-brain-plugins/youtube-wiki/skills/cartoon-hyperframes-animator")
 POSES_DIR = SKILL_DIR / "assets" / "poses"
+BACKGROUNDS_DIR = SKILL_DIR / "assets" / "backgrounds"
 AUDIO_DIR = SKILL_DIR / "assets" / "audio"
 BGM_FILE = AUDIO_DIR / "bgm-comedy.mp3"
 SFX_DIR = AUDIO_DIR / "sfx"
@@ -112,15 +113,30 @@ def draw_subtitle_card(draw, text, y_center=1600, max_w=920):
         draw.text((lx, ly), line, font=font_sub, fill=INK_COLOR)
 
 def render_scene_frame(sc, beat_type="a", out_path=None):
-    img = Image.new("RGB", (1080, 1920), BG_COLOR)
-    draw = ImageDraw.Draw(img)
+    floor_y = 1380
+    env_name = sc.get("environment_bg")
+    bg_loaded = False
+
+    if env_name:
+        bg_path = BACKGROUNDS_DIR / env_name
+        if bg_path.exists():
+            try:
+                bg_img = Image.open(bg_path).convert("RGB")
+                if bg_img.size != (1080, 1920):
+                    bg_img = bg_img.resize((1080, 1920), Image.LANCZOS)
+                img = bg_img.copy()
+                draw = ImageDraw.Draw(img)
+                bg_loaded = True
+            except Exception as e:
+                print(f"Failed to load background {env_name}: {e}")
+
+    if not bg_loaded:
+        img = Image.new("RGB", (1080, 1920), BG_COLOR)
+        draw = ImageDraw.Draw(img)
+        draw_floor_and_grounding(draw, floor_y)
 
     # 1. Comic 4-Tier Header (Act Tag + Headline + Angled Stamp)
     draw_comic_header(draw, img, sc)
-
-    # 2. Floor line & grounding
-    floor_y = 1380
-    draw_floor_and_grounding(draw, floor_y)
 
     # 3. Character Pose
     pose_name = sc.get("pose", "pose_0.png")
@@ -242,8 +258,18 @@ def render_single_scene_av(rec, sb, clips_dir, frames_dir, segs_dir):
     seg_b = segs_dir / f"seg_{sc_id:02d}_b.mp4"
 
     motion = sb.get("camera", "push_in")
-    m_a = "push" if motion == "push_in" else ("shake" if motion == "shake" else "static")
-    m_b = "punch" if motion in ["shake", "punch"] else "push"
+    if motion == "shake":
+        m_a = "push"
+        m_b = "shake"
+    elif motion == "wide_pan":
+        m_a = "push"
+        m_b = "pan"
+    elif motion in ["punch", "punch_in"]:
+        m_a = "static"
+        m_b = "punch"
+    else:
+        m_a = "push"
+        m_b = "push"
 
     # Render beat a
     vf_a = f"zoompan=z='min(zoom+0.0008,1.06)':d={max(1, int(dur_a*30))}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920:fps=30" if m_a == "push" else "null"
@@ -256,7 +282,9 @@ def render_single_scene_av(rec, sb, clips_dir, frames_dir, segs_dir):
 
     # Render beat b
     if m_b == "shake":
-        vf_b = f"zoompan=z='1.04':d={max(1, int(dur_b*30))}:x='iw/2-(iw/zoom/2)+sin(in*3)*6':y='ih/2-(ih/zoom/2)+cos(in*3)*6':s=1080x1920:fps=30"
+        vf_b = f"zoompan=z='1.04':d={max(1, int(dur_b*30))}:x='iw/2-(iw/zoom/2)+sin(in*3)*8':y='ih/2-(ih/zoom/2)+cos(in*3)*8':s=1080x1920:fps=30"
+    elif m_b == "pan":
+        vf_b = f"zoompan=z='1.03':d={max(1, int(dur_b*30))}:x='min(iw/2-(iw/zoom/2)+in*1.2,iw*0.04)':y='ih/2-(ih/zoom/2)':s=1080x1920:fps=30"
     elif m_b == "punch":
         vf_b = f"zoompan=z='if(lte(in,6),1.0+in*0.015,1.09)':d={max(1, int(dur_b*30))}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920:fps=30"
     else:

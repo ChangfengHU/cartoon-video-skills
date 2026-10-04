@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from common import init_node_context, find_upstream_artifact, write_manifest
 
 POSES_DIR = Path("/home/claude/agent-brain-plugins/youtube-wiki/skills/cartoon-hyperframes-animator/assets/poses")
+BACKGROUNDS_DIR = Path("/home/claude/agent-brain-plugins/youtube-wiki/skills/cartoon-hyperframes-animator/assets/backgrounds")
 
 def sha256_file(p):
     h = hashlib.sha256()
@@ -50,6 +51,18 @@ def main():
                     "prop_name": prop_name,
                     "path": str(pr),
                     "sha256": sha256_file(pr)
+                })
+
+        env_bg = s.get("environment_bg")
+        if env_bg:
+            bg_p = BACKGROUNDS_DIR / env_bg
+            if bg_p.exists():
+                verified_assets.append({
+                    "scene_id": s.get("scene_id"),
+                    "asset_type": "background",
+                    "background_name": env_bg,
+                    "path": str(bg_p),
+                    "sha256": sha256_file(bg_p)
                 })
 
     receipt = {

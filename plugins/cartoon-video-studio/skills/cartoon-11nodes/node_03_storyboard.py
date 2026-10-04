@@ -61,6 +61,48 @@ def detect_scene_prop_and_pose(dialogue, scene_id):
 
     return prop, suggested_pose
 
+def detect_scene_environment(dialogue, scene_id):
+    d = dialogue.lower()
+    if any(k in d for k in ["床", "早晨", "醒来", "卧室", "被窝", "爬起来"]):
+        return "bg_bedroom_messy.png", "乱糟糟的早晨卧室，被子散乱，窗外晨光照入"
+    elif any(k in d for k in ["衣柜", "衣服", "睡衣", "校服", "面料"]):
+        return "bg_wardrobe_open.png", "敞开的双门大衣柜，挂满十年前旧衣物与高中校服"
+    elif any(k in d for k in ["数据线", "电线", "充电器", "抽屉", "接口", "电子"]):
+        return "bg_desk_cables.png", "书桌电脑前抽屉大开，缠绕着杂乱废弃的数据线与插头"
+    elif any(k in d for k in ["网购", "手机", "搜", "下单", "凑单", "买它", "神器", "洞洞板"]):
+        return "bg_night_laptop.png", "深夜书桌台灯暖光下，笔记本电脑屏幕显示疯抢收纳神器购物车"
+    elif any(k in d for k in ["阳台", "厨房", "油刷", "空气炸锅", "零食", "收纳盒"]):
+        return "bg_balcony_snacks.png", "阳台多层收纳置物架，塞满未拆封零食与杂物"
+    elif any(k in d for k in ["快递堆", "城墙", "堡垒", "纸箱城", "下脚", "满屋"]):
+        return "bg_cardboard_fortress.png", "客厅堆满直通天花板的纸箱城墙，形成纸箱堡垒"
+    elif any(k in d for k in ["门口", "走廊", "电梯", "扔", "垃圾桶"]):
+        return "bg_hallway_boxes.png", "公寓楼走廊通道，门前堆放着等待处理的大号纸箱与快递"
+    elif any(k in d for k in ["空荡荡", "空虚", "干净", "冷静", "反思"]):
+        return "bg_empty_room.png", "空无一物的极简房间，阳光穿透窗户在地板留下回音"
+    elif any(k in d for k in ["悟", "禅", "最高境界", "不在乎", "执念", "躺平"]):
+        return "bg_zen_office_chair.png", "纸箱围拢的中央办公转椅，头顶微光，万物皆空禅意境界"
+    else:
+        if scene_id in [1, 2]:
+            return "bg_livingroom_boxes.png", "凌乱客厅，旧沙发与拆开的纸箱"
+        elif scene_id in [8, 9]:
+            return "bg_hallway_boxes.png", "走廊门口快递纸箱堆"
+        elif scene_id in [10, 11]:
+            return "bg_cardboard_fortress.png", "纸箱堡垒客厅"
+        elif scene_id == 12:
+            return "bg_zen_office_chair.png", "纸箱堆里的转椅禅意空间"
+        else:
+            return "bg_livingroom_boxes.png", "客厅沙发与杂物堆"
+
+def detect_scene_camera_motion(dialogue, emotion, scene_id):
+    if emotion in ["shocked", "panicked", "desperate", "frustrated"]:
+        return "shake"
+    elif emotion in ["smug", "proud", "realized", "focused"]:
+        return "push_in"
+    elif any(k in dialogue for k in ["城墙", "堡垒", "满屋", "乱糟糟", "到处", "快递堆"]):
+        return "wide_pan"
+    else:
+        return "push_in"
+
 AVAILABLE_SFX = [
     "typing",
     "notification",
@@ -300,16 +342,23 @@ def main():
             "stamp_angle": stamp_angle
         }
 
+        env_bg, env_desc = detect_scene_environment(dialogue, i)
+        cam_motion = detect_scene_camera_motion(dialogue, emotion, i)
+        visual_prompt = f"Warm paper comic style [{act_tag}]: {env_desc}. Character performing {chosen_pose} with emotion {emotion}. Story prop: {prop or 'none'}."
+
         sc = {
             "scene_id": i,
             "title": f"第{i}幕",
             "dialogue": dialogue,
             "acting_note": acting,
             "estimated_duration": 8.0,
+            "environment_bg": env_bg,
+            "environment_desc": env_desc,
+            "visual_prompt": visual_prompt,
             "pose": chosen_pose,
             "prop": prop,
             "emotion": emotion,
-            "camera": camera,
+            "camera": cam_motion,
             "sfx_cue": sfx_cue,
             "bgm_cut": bgm_cut,
             "act_tag": act_tag,
