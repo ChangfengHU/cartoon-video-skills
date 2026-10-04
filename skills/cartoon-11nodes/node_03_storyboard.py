@@ -24,8 +24,42 @@ AVAILABLE_POSES = [
     "pose_11.png",  # 敬礼乖巧/认错
     "pose_12.png",  # 叹气丧气/低头
     "pose_13.png",  # 连滚带爬逃跑
-    "pose_14.png"   # 佛系打坐/看化
+    "pose_14.png",  # 佛系打坐/看化
+    "pose_15.png",  # 握拳宣誓/立Flag (fist_pump)
+    "pose_16.png",  # 抱大箱子/负重前行 (carrying)
+    "pose_17.png",  # 蹲地拆箱/狂拆快递 (unpacking)
+    "pose_18.png",  # 仰面瘫坐/彻底躺平 (kicking_back)
+    "pose_19.png",  # 端碗吃面/安慰自己 (eating)
+    "pose_20.png",  # 贼眉鼠眼/暗自得意 (scheming)
+    "pose_21.png"   # 呆滞注视/石化无语 (staring)
 ]
+
+def detect_scene_prop_and_pose(dialogue, scene_id):
+    d = dialogue.lower()
+    prop = None
+    suggested_pose = None
+    if any(k in d for k in ["镜子", "照镜", "深呼吸", "看自己"]):
+        prop = "prop_mirror.png"
+        suggested_pose = "pose_6.png"  # 暗中侧目看镜子
+    elif any(k in d for k in ["旧衣服", "睡衣", "t恤", "大衣柜", "穿穿", "面料"]):
+        prop = "prop_hanger.png"
+        suggested_pose = "pose_9.png"  # 无奈耸肩看着旧衣服
+    elif any(k in d for k in ["数据线", "电线", "充电线", "插头", "电子传家宝"]):
+        prop = "prop_cables.png"
+        suggested_pose = "pose_2.png"  # 疑惑抓头
+    elif any(k in d for k in ["收纳箱", "纸箱", "快递", "洞洞板", "大箱子", "城墙", "堆满", "满屋子"]):
+        prop = "prop_storage_box.png"
+        if scene_id in [10, 11]:
+            suggested_pose = "pose_17.png"  # 拆箱/箱子堆
+        elif scene_id == 12:
+            suggested_pose = "pose_18.png"  # 躺在箱子堆里
+        else:
+            suggested_pose = "pose_16.png"  # 抱箱子
+    elif any(k in d for k in ["吃", "泡面", "点外卖", "午饭", "喝水"]):
+        prop = "prop_coffee_mug.png"
+        suggested_pose = "pose_19.png"  # 吃面
+
+    return prop, suggested_pose
 
 AVAILABLE_SFX = [
     "typing",
@@ -215,13 +249,13 @@ def main():
         acting = s.get("acting_note", "")
         ls = llm_scenes_map.get(i)
 
+        prop, suggested_pose = detect_scene_prop_and_pose(dialogue, i)
+
         fallback_pose, fallback_sfx, fallback_emotion = get_fallback_pose_and_sfx(i, dialogue)
         fallback_hero = build_fallback_hero_card(i, dialogue)
 
         if ls and ls.get("hero_card"):
-            pose = ls.get("pose", fallback_pose)
-            if pose not in AVAILABLE_POSES:
-                pose = fallback_pose
+            raw_pose = ls.get("pose")
             emotion = ls.get("emotion", fallback_emotion)
             camera = ls.get("camera", "push_in")
             sfx_cue = ls.get("sfx_cue", fallback_sfx)
@@ -230,18 +264,28 @@ def main():
             hero_card = ls.get("hero_card", fallback_hero)
         else:
             hero_card = fallback_hero
-            pose = fallback_pose
+            raw_pose = fallback_pose
             emotion = fallback_emotion
             camera = "shake" if emotion in ["shocked", "panicked", "desperate"] else "push_in"
             sfx_cue = fallback_sfx
 
-        # ANTI-REPETITION GUARD: never repeat the same pose back-to-back
-        if used_poses and pose == used_poses[-1]:
-            # pick a contrasting pose
-            contrast_pool = [p for p in AVAILABLE_POSES if p != pose and (len(used_poses) < 2 or p != used_poses[-2])]
-            pose = contrast_pool[(i * 3) % len(contrast_pool)]
+        # STRICT ZERO-REPETITION POSE SELECTION:
+        # Every scene cut MUST have a distinct character expression/pose
+        chosen_pose = None
+        if suggested_pose and suggested_pose in AVAILABLE_POSES and suggested_pose not in used_poses:
+            chosen_pose = suggested_pose
+        elif raw_pose and raw_pose in AVAILABLE_POSES and raw_pose not in used_poses:
+            chosen_pose = raw_pose
+        elif fallback_pose in AVAILABLE_POSES and fallback_pose not in used_poses:
+            chosen_pose = fallback_pose
+        else:
+            unused_pool = [p for p in AVAILABLE_POSES if p not in used_poses]
+            if unused_pool:
+                chosen_pose = unused_pool[0]
+            else:
+                chosen_pose = AVAILABLE_POSES[i % len(AVAILABLE_POSES)]
 
-        used_poses.append(pose)
+        used_poses.append(chosen_pose)
 
         act_tag = s.get("act_tag") or f"场景 · {i}"
         headline = s.get("headline") or f"断舍离第 {i} 幕"
@@ -262,7 +306,8 @@ def main():
             "dialogue": dialogue,
             "acting_note": acting,
             "estimated_duration": 8.0,
-            "pose": pose,
+            "pose": chosen_pose,
+            "prop": prop,
             "emotion": emotion,
             "camera": camera,
             "sfx_cue": sfx_cue,

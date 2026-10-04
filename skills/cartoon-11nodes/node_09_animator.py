@@ -155,9 +155,58 @@ def render_scene_frame(sc, beat_type="a", out_path=None):
         scale = target_h / ph
         target_w = int(pw * scale)
         p_resized = p_img.resize((target_w, target_h), Image.LANCZOS)
+
+        prop_name = sc.get("prop")
         char_x = (1080 - target_w) // 2
         char_y = floor_y - target_h + 10
+
+        # Dynamic layout: avoid character and prop overlap
+        if prop_name:
+            if "mirror" in prop_name:
+                char_x = max(440, (1080 - target_w) // 2 + 180)
+            elif "storage_box" in prop_name:
+                if sc.get("scene_id") in [10, 11]:
+                    char_x = (1080 - target_w) // 2
+                else:
+                    char_x = min(280, (1080 - target_w) // 2 - 130)
+            elif any(k in prop_name for k in ["hanger", "cables", "coffee_mug"]):
+                char_x = min(320, (1080 - target_w) // 2 - 120)
+
         img.paste(p_resized, (char_x, char_y), p_resized)
+
+        # 3.5 Story Prop Rendering (Mirror, Storage Box, Hanger, Cables)
+        prop_name = sc.get("prop")
+        if prop_name:
+            prop_path = POSES_DIR / prop_name
+            if prop_path.exists():
+                pr_img = Image.open(prop_path).convert("RGBA")
+                pr_w, pr_h = pr_img.size
+                if "mirror" in prop_name:
+                    target_ph = 680
+                    scale_p = target_ph / pr_h
+                    target_pw = int(pr_w * scale_p)
+                    pr_resized = pr_img.resize((target_pw, target_ph), Image.LANCZOS)
+                    img.paste(pr_resized, (110, floor_y - target_ph + 25), pr_resized)
+                elif "storage_box" in prop_name:
+                    target_ph = 300
+                    scale_p = target_ph / pr_h
+                    target_pw = int(pr_w * scale_p)
+                    pr_resized = pr_img.resize((target_pw, target_ph), Image.LANCZOS)
+                    img.paste(pr_resized, (700, floor_y - target_ph + 15), pr_resized)
+                    if sc.get("scene_id") in [10, 11]:
+                        img.paste(pr_resized, (130, floor_y - target_ph + 15), pr_resized)
+                elif "hanger" in prop_name:
+                    target_ph = 360
+                    scale_p = target_ph / pr_h
+                    target_pw = int(pr_w * scale_p)
+                    pr_resized = pr_img.resize((target_pw, target_ph), Image.LANCZOS)
+                    img.paste(pr_resized, (690, floor_y - target_ph - 120), pr_resized)
+                elif "cables" in prop_name:
+                    target_ph = 220
+                    scale_p = target_ph / pr_h
+                    target_pw = int(pr_w * scale_p)
+                    pr_resized = pr_img.resize((target_pw, target_ph), Image.LANCZOS)
+                    img.paste(pr_resized, (680, floor_y - target_ph + 20), pr_resized)
 
         # 4. Comic FX overlay on Beat B
         if beat_type == "b":

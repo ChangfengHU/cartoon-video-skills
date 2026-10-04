@@ -27,9 +27,17 @@ def main():
     if total_chars < 180:
         raise ValueError(f"Total dialogue characters too low: {total_chars} (min 180 characters required for 80s target)")
 
+    # Anti-Repetition Character Expression Guard
+    scene_poses = [s.get("pose") for s in scenes]
+    unique_poses = set(scene_poses)
+    if len(unique_poses) != len(scenes):
+        duplicates = [p for p in unique_poses if scene_poses.count(p) > 1]
+        raise ValueError(f"Director Guard violation: Duplicate character poses detected across scenes: {duplicates}. Every camera cut must feature a unique non-repeating character pose/expression (unique {len(unique_poses)} != total {len(scenes)}).")
+
     receipt = {
         "status": "passed",
         "scene_count": len(scenes),
+        "unique_poses_count": len(unique_poses),
         "total_estimated_seconds": storyboard.get("total_estimated_seconds", 96.0),
         "checked_at": datetime.now(timezone.utc).isoformat(),
         "node_run_id": node_run_id

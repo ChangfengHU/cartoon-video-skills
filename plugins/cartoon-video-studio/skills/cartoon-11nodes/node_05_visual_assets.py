@@ -34,10 +34,23 @@ def main():
         digest = sha256_file(p)
         verified_assets.append({
             "scene_id": s.get("scene_id"),
+            "asset_type": "pose",
             "pose_name": pose_name,
             "path": str(p),
             "sha256": digest
         })
+
+        prop_name = s.get("prop")
+        if prop_name:
+            pr = POSES_DIR / prop_name
+            if pr.exists():
+                verified_assets.append({
+                    "scene_id": s.get("scene_id"),
+                    "asset_type": "prop",
+                    "prop_name": prop_name,
+                    "path": str(pr),
+                    "sha256": sha256_file(pr)
+                })
 
     receipt = {
         "status": "ready",
