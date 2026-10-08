@@ -1,9 +1,34 @@
 # Private cartoon asset MCP
 
-Thirteen tools (v1.2): `library_info`, `asset_search`, `character_search`,
+Fifteen tools (v1.3): `library_info`, `asset_search`, `character_search`,
 `character_get`, `character_assets`, `character_history`, `asset_get`, `asset_register`,
-`asset_revise`, `asset_feedback`, `asset_feedback_list`, `project_freeze`, `project_get`.
+`asset_revise`, `asset_feedback`, `asset_feedback_list`, `project_freeze`, `project_get`,
+`character_materials`, `character_register_material`.
 The Skill makes videos; this service manages reusable assets and evidence only.
+
+## Realistic and cartoon production materials
+
+Character search accepts explicit `representation:realistic|cartoon|unclassified`.
+Known legacy style descriptions can identify cartoons; unknown old assets remain
+unclassified. Representation and `studio_id` are metadata, not a new tenant or
+an expansion of the credential's R2 scope.
+
+`character_materials({character_id,profile_asset_id?})` returns a fixed identity,
+face/proportion locks, grouped identity/turnaround/expression/action/wardrobe/scene
+images, voices, SFX, BGM and videos, source/license/hash and missing/approval counts.
+Pin the returned profile ID for production. An inventory is not visual or audio QA.
+Metadata-only voice/review revisions keep compatible materials; identity design
+version, image hash or locks changing requires selecting compatible assets anew.
+
+`character_register_material` links an already owned asset by append-only revision.
+Supply explicit character_id, category, representation, studio_id and reason;
+non-identity categories additionally require expected_profile_asset_id. Identity
+requires profile{id,name,version} and identity_lock{face,body_proportions}. User
+approval requires truthful evidence; new materials do not inherit static approval.
+Existing file, source and rights cannot be replaced by this operation. Category
+must match kind; `kind:video` now supports archived or metadata-only sample clips.
+It never generates media, changes credentials, deletes history or silently chooses
+between ambiguous identity roots. Existing 13 tools and project rights review remain.
 
 ## Character-first reads
 

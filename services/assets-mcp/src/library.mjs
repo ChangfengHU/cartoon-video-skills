@@ -1,6 +1,24 @@
 // Immutable R2 facts. No Cloudflare administration, URL fetching, deletion or model calls.
 export const MAX_FILE = 20_000_000;
-export const KINDS = ['image', 'sfx', 'voice', 'bgm', 'reference'];
+export const KINDS = ['image', 'sfx', 'voice', 'bgm', 'reference', 'video'];
+export const MATERIAL_CATEGORIES = ['identity_reference','turnaround','expressions','actions','wardrobe','scenes','voices','sfx','bgm','videos','other'];
+export function representationOf(record) {
+  const t = record?.technical || {}, p = t.character_profile || {};
+  const value = t.representation || p.representation;
+  if (['photorealistic_virtual','photorealistic','live_action','realistic'].includes(value)) return 'realistic';
+  if (value === 'cartoon') return 'cartoon';
+  const style = String(p.style || t.style || '');
+  if (/卡通|动漫|动画|手绘|水彩|黏土|cartoon|illustration|anime|clay|watercolor/i.test(style)) return 'cartoon';
+  if (/写实|真人|photoreal|live.action/i.test(style)) return 'realistic';
+  return 'unclassified';
+}
+function materialCategory(record) {
+  const role = record.technical?.asset_kind || '';
+  if (record.kind === 'video') return 'videos';
+  if (/turnaround|三视图/.test(role)) return 'turnaround';
+  if (/wardrobe|costume|服装/.test(role)) return 'wardrobe';
+  return assetCategory(record);
+}
 export class Rejected extends Error {
   constructor(message, status = 400) { super(message); this.status = status; }
 }
@@ -180,16 +198,17 @@ export class Library {
     }
     return {records,characters};
   }
-  async characterSearch({query = '', limit = 20} = {}) {
+  async characterSearch({query = '', limit = 20, representation} = {}) {
     assert(typeof query === 'string' && query.length <= 300, 'Invalid character query');
     assert(Number.isInteger(limit) && limit >= 1 && limit <= 50, 'Invalid character limit');
+    assert(representation === undefined || ['realistic','cartoon','unclassified'].includes(representation), 'Invalid representation');
     const {characters} = await this.characterCatalog();
     const words = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
     const results = characters.map(entry => {
       const profile = entry.current?.technical?.character_profile || entry.leaves[0]?.technical?.character_profile || {};
       const version = profile.version ?? profile.profile_version ?? null;
-      return {character_id:entry.character_id,name:profile.name || entry.current?.title || entry.leaves[0]?.title || entry.character_id,profile_asset_id:entry.current?.id || null,profile_version:version,lifecycle:entry.current ? 'active' : 'unresolved',status:entry.current?.technical?.preproduction?.status_label || null,warnings:entry.warnings};
-    }).filter(result => words.every(word => JSON.stringify([result.character_id,result.name,result.status]).toLowerCase().includes(word)));
+      return {character_id:entry.character_id,name:profile.name || entry.current?.title || entry.leaves[0]?.title || entry.character_id,profile_asset_id:entry.current?.id || null,profile_version:version,representation:representationOf(entry.current || entry.leaves[0]),studio_id:entry.current?.technical?.studio_id || null,lifecycle:entry.current ? 'active' : 'unresolved',status:entry.current?.technical?.preproduction?.status_label || null,warnings:entry.warnings};
+    }).filter(result => (!representation || result.representation === representation) && words.every(word => JSON.stringify([result.character_id,result.name,result.status]).toLowerCase().includes(word)));
     return {characters:results.slice(0,limit),total:results.length,note:'Character views resolve current profiles across the private R2 catalog. Use character_get by character_id; asset_search remains paginated discovery for individual assets.'};
   }
   async characterGet(characterId) {
@@ -226,6 +245,66 @@ export class Library {
     const entry = characters.find(character => character.character_id === characterId);
     assert(entry, 'Character not found', 404);
     return {character_id:characterId,current_profile_asset_id:entry.current?.id || null,warnings:entry.warnings,revisions:entry.profiles.map(record => ({id:record.id,title:record.title,lifecycle:lifecycle(record),supersedes:record.supersedes || null,profile_version:record.technical?.character_profile?.version ?? record.technical?.character_profile?.profile_version ?? null,revision_reason:record.revision_reason || null})),note:'History is immutable and may include retired revisions. Do not select a historical profile for a new production without an explicit reason.'};
+  }
+  async characterMaterials({character_id, profile_asset_id} = {}) {
+    assert(typeof character_id === 'string' && /^[A-Za-z0-9_-]{1,100}$/.test(character_id), 'Invalid character ID');
+    const {characters,records} = await this.characterCatalog();
+    const entry = characters.find(x => x.character_id === character_id);
+    assert(entry, 'Character not found', 404);
+    const identity = profile_asset_id ? entry.profiles.find(x => x.id === profile_asset_id) : entry.current;
+    assert(identity, 'Character profile is missing or ambiguous; supply an owned profile_asset_id', 409);
+    assert(lifecycle(identity) !== 'retired', 'Selected identity is retired', 409);
+    const identityKey = record => canonical({version:record.technical?.character_profile?.version,lock:record.technical?.identity_lock,sha256:record.object?.sha256 || record.technical?.sha256 || null});
+    const compatibleProfiles = new Set(entry.profiles.filter(x => identityKey(x) === identityKey(identity)).map(x => x.id));
+    const successors = new Set(records.map(x => x.supersedes).filter(Boolean));
+    const selected = records.filter(x => !successors.has(x.id) && lifecycle(x) !== 'retired' && (x.character_ids || []).includes(character_id) && (!x.technical?.character_profile_asset_id || compatibleProfiles.has(x.technical.character_profile_asset_id)));
+    const assets = Object.fromEntries(MATERIAL_CATEGORIES.map(x => [x,[]]));
+    for (const record of selected) {
+      if (materialCategory(record) === 'identity_reference' && record.id !== identity.id) continue;
+      assets[materialCategory(record)].push({...assetSummary(record),source_url:record.source_url,license:record.license,view:record.technical?.view || null,costume:record.technical?.costume || null,profile_asset_id:record.technical?.character_profile_asset_id || null,sha256:record.object?.sha256 || record.technical?.sha256 || null,download:record.object ? {url:`${this.origin}/v1/assets/${record.id}/file`,authentication:'service Bearer required'} : null});
+    }
+    if (!assets.identity_reference.some(x => x.id === identity.id)) assets.identity_reference.push({...assetSummary(identity),source_url:identity.source_url,license:identity.license,profile_asset_id:identity.id,sha256:identity.object?.sha256 || identity.technical?.sha256 || null,download:identity.object ? {url:`${this.origin}/v1/assets/${identity.id}/file`,authentication:'service Bearer required'} : null});
+    const required = ['identity_reference','turnaround','expressions','actions','wardrobe','scenes','voices','videos'];
+    return {schema:'character-materials/v1',character_id,profile_asset_id:identity.id,profile_version:identity.technical?.character_profile?.version ?? null,representation:representationOf(identity),studio_id:identity.technical?.studio_id || null,profile:identity.technical?.character_profile || {},identity_lock:identity.technical?.identity_lock || null,voice_recommendation:identity.technical?.voice_recommendation || null,assets,coverage:Object.fromEntries(required.map(category => [category,{count:assets[category].length,approved:assets[category].filter(x => x.review_status === 'user_approved').length}])),missing:required.filter(x => !assets[x].length),warnings:entry.warnings,note:'Candidates are not approved. A bundle is not a generation, rights, lip-sync or visual-quality certification. Pin profile_asset_id in the project.'};
+  }
+  async registerCharacterMaterial({id,character_id,category,representation,studio_id,profile,identity_lock,expected_profile_asset_id,reason} = {}) {
+    this.writeAllowed();
+    assert(typeof character_id === 'string' && /^[A-Za-z0-9_-]{1,100}$/.test(character_id), 'Invalid character ID');
+    assert(MATERIAL_CATEGORIES.includes(category) && category !== 'other', 'Invalid material category');
+    assert(['photorealistic_virtual','live_action','cartoon'].includes(representation), 'Explicit representation required');
+    assert(typeof studio_id === 'string' && /^[a-z0-9-]{1,100}$/.test(studio_id), 'Explicit studio ID required');
+    const {asset} = await this.get(id);
+    assert(lifecycle(asset) !== 'retired', 'Retired material cannot be linked', 409);
+    const kind = {voices:'voice',sfx:'sfx',bgm:'bgm',videos:'video'}[category] || 'image';
+    assert(asset.kind === kind, 'Material category does not match asset kind');
+    let current, existing;
+    if (category === 'identity_reference') {
+      assert(profile && profile.id === character_id && typeof profile.name === 'string' && profile.name.trim() && ((typeof profile.version === 'string' && profile.version.trim()) || Number.isInteger(profile.version)), 'Identity profile requires matching ID, name and version');
+      assert(identity_lock && typeof identity_lock === 'object' && !Array.isArray(identity_lock) && typeof identity_lock.face === 'string' && identity_lock.face.trim() && typeof identity_lock.body_proportions === 'string' && identity_lock.body_proportions.trim(), 'Identity requires face and body-proportion locks');
+      if (profile.approval === 'user_approved_visual_design') assert(typeof profile.approval_evidence === 'string' && profile.approval_evidence.trim(), 'Do not invent user approval');
+      const catalog = await this.characterCatalog();
+      existing = catalog.characters.find(x => x.character_id === character_id);
+    } else {
+      assert(profile === undefined && identity_lock === undefined, 'Only the identity material owns the profile and locks');
+      current = await this.characterGet(character_id);
+      assert(expected_profile_asset_id === current.profile_asset_id, 'Character profile changed or not pinned; refresh before linking', 409);
+      const root = await this.load('records',current.profile_asset_id);
+      assert(representationOf(root) === (representation === 'cartoon' ? 'cartoon' : 'realistic'), 'Representation differs from the selected identity');
+      assert(!root.technical?.studio_id || root.technical.studio_id === studio_id, 'Studio differs from the selected identity');
+    }
+    const technical = {...asset.technical,asset_kind:category,representation,studio_id,character_material_schema:'character-material/v1'};
+    if (profile) technical.character_profile = profile;
+    if (identity_lock) technical.identity_lock = identity_lock;
+    if (current) technical.character_profile_asset_id = current.profile_asset_id;
+    const patch = {character_ids:[...new Set([...(asset.character_ids || []),character_id])],technical};
+    if (existing && existing.current?.id !== id) {
+      // Retrying an identical link must resolve its original immutable revision,
+      // while a changed request must not create a second identity root.
+      const {id:ignored,created_at,...previous} = asset;
+      const expected = await sha(canonical({...previous,...patch,supersedes:id,revision_reason:reason}));
+      assert(existing.current?.id === expected, 'Revise the existing identity instead of creating a second root', 409);
+    }
+    return this.revise(id,patch,reason);
   }
   async search({query = '', kind, cursor, limit = 40, tags_all = [], character_id, license_status, archive_allowed, bpm_min, bpm_max} = {}) {
     assert(Array.isArray(tags_all) && tags_all.length <= 20 && tags_all.every(t => typeof t === 'string'), 'Invalid tags filter');

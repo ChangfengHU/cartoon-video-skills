@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {Library,sha,validateCard,authenticate} from '../src/library.mjs';
+import {Library,sha,validateCard,authenticate,representationOf} from '../src/library.mjs';
 class MemoryR2 {
   data = new Map();
   async get(key) { const bytes = this.data.get(key); if(!bytes) return null; return {size:bytes.byteLength, text:async()=>new TextDecoder().decode(bytes),arrayBuffer:async()=>bytes,body:new Blob([bytes]).stream()}; }
@@ -150,4 +150,69 @@ test('ambiguous character profile leaves are surfaced instead of silently select
  assert.equal(result.characters[0].profile_asset_id,null); assert.match(result.characters[0].warnings[0],/Multiple active/);
  await assert.rejects(()=>l.characterGet(id),{status:409});
  assert.notEqual(a.id,b.id);
+});
+
+const realLink={character_id:'campus-real',representation:'photorealistic_virtual',studio_id:'vyibc-flow-video-studio',reason:'Link independently reviewed material'};
+const identityDetails={category:'identity_reference',profile:{id:'campus-real',name:'真人虚拟角色',version:'static-05',approval:'user_approved_visual_design',approval_evidence:'User approved the static reference only'},identity_lock:{face:'Use the approved face',body_proportions:'Preserve reference geometry'}};
+async function realIdentity(l){const a=await l.register({...card,kind:'image',title:'Approved reference'}, {bytes:new Uint8Array([1,2,3]),extension:'.png'});return {original:a,linked:await l.registerCharacterMaterial({...realLink,...identityDetails,id:a.id})};}
+
+test('representation is explicit or evidence-based; unknown legacy records stay unclassified',()=>{
+ assert.equal(representationOf({technical:{representation:'photorealistic_virtual'}}),'realistic');
+ assert.equal(representationOf({technical:{character_profile:{style:'暖纸手绘卡通'}}}),'cartoon');
+ assert.equal(representationOf({kind:'image'}),'unclassified');
+});
+test('identity linking preserves file, source, rights and makes exact retry idempotent',async()=>{
+ const l=setup(),{original,linked}=await realIdentity(l);
+ const retry=await l.registerCharacterMaterial({...realLink,...identityDetails,id:original.id});
+ assert.equal(retry.id,linked.id);assert.equal(retry.deduplicated,true);
+ assert.deepEqual(linked.record.object,original.record.object);assert.deepEqual(linked.record.license,original.record.license);
+ assert.equal(linked.record.source_url,original.record.source_url);
+ assert.equal((await l.characterSearch({representation:'realistic'})).characters[0].profile_asset_id,linked.id);
+ assert.equal((await l.characterSearch({representation:'cartoon'})).total,0);
+});
+test('new identity root, invented approval and empty locks are rejected',async()=>{
+ const l=setup(),{original}=await realIdentity(l);
+ const second=await l.register({...card,kind:'image',title:'Other face'});
+ await assert.rejects(()=>l.registerCharacterMaterial({...realLink,...identityDetails,id:second.id}),{status:409});
+ await assert.rejects(()=>l.registerCharacterMaterial({...realLink,...identityDetails,id:original.id,profile:{...identityDetails.profile,approval_evidence:''}}),/approval/);
+ await assert.rejects(()=>l.registerCharacterMaterial({...realLink,...identityDetails,id:original.id,identity_lock:{face:'',body_proportions:'locked'}}),/locks/);
+});
+test('real material bundle separates views, wardrobe, videos and candidates with pinned identity',async()=>{
+ const l=setup(),{linked}=await realIdentity(l);
+ const expected_profile_asset_id=linked.id;
+ const categories=['turnaround','expressions','actions','wardrobe','scenes','voices','videos'];
+ for(const category of categories){
+   const kind={voices:'voice',videos:'video'}[category]||'image';
+   const a=await l.register({...card,kind,title:category,technical:{view:'three-quarter',costume:'reference-05'}});
+   const params={...realLink,id:a.id,category,expected_profile_asset_id};
+   const r=await l.registerCharacterMaterial(params);
+   assert.equal((await l.registerCharacterMaterial(params)).id,r.id);
+ }
+ const bundle=await l.characterMaterials({character_id:realLink.character_id,profile_asset_id:linked.id});
+ assert.equal(bundle.profile_asset_id,linked.id);assert.equal(bundle.assets.turnaround.length,1);
+ assert.equal(bundle.assets.wardrobe.length,1);assert.equal(bundle.assets.videos[0].kind,'video');
+ assert.equal(bundle.assets.turnaround[0].profile_asset_id,linked.id);
+ assert.equal(bundle.assets.turnaround[0].license.status,card.license.status);
+ assert.equal(bundle.coverage.actions.approved,0);assert.deepEqual(bundle.missing,[]);
+ assert.equal(bundle.assets.identity_reference[0].sha256,linked.record.object.sha256);
+});
+test('material linking rejects stale or missing identity pins, mismatched studio/type and read-only callers',async()=>{
+ const l=setup(),{linked}=await realIdentity(l),a=await l.register({...card,kind:'image'});
+ const base={...realLink,id:a.id,category:'actions',expected_profile_asset_id:linked.id};
+ for(const patch of [{expected_profile_asset_id:undefined},{expected_profile_asset_id:'f'.repeat(64)},{studio_id:'another'},{representation:'cartoon'},{category:'videos'}])await assert.rejects(()=>l.registerCharacterMaterial({...base,...patch}));
+ await assert.rejects(()=>setup({...principal,permissions:['read']},l.bucket).registerCharacterMaterial(base),{status:403});
+ await assert.rejects(()=>setup({...principal,prefix:'other/v2',legacy_prefix:undefined},l.bucket).characterMaterials({character_id:realLink.character_id}),{status:404});
+ const next=await l.revise(linked.id,{technical:{...linked.record.technical,character_profile:{...identityDetails.profile,version:'06'}}},'Explicit new identity');
+ await assert.rejects(()=>l.registerCharacterMaterial(base),{status:409});
+ assert.equal((await l.characterMaterials({character_id:realLink.character_id,profile_asset_id:linked.id})).assets.identity_reference[0].id,linked.id);
+ assert.equal((await l.characterMaterials({character_id:realLink.character_id})).profile_asset_id,next.id);
+});
+test('voice/review metadata revisions do not orphan materials, but a new identity version does',async()=>{
+ const l=setup(),{linked}=await realIdentity(l),a=await l.register({...card,kind:'image',title:'Side pose'});
+ await l.registerCharacterMaterial({...realLink,id:a.id,category:'actions',expected_profile_asset_id:linked.id});
+ const next=await l.revise(linked.id,{technical:{...linked.record.technical,voice_recommendation:{voice_id:'provider-preset'}}},'Change voice only');
+ assert.equal((await l.characterMaterials({character_id:realLink.character_id})).assets.actions.length,1);
+ await l.revise(next.id,{technical:{...next.record.technical,character_profile:{...identityDetails.profile,version:'new-design'}}},'New identity version');
+ assert.equal((await l.characterMaterials({character_id:realLink.character_id})).assets.actions.length,0);
+ assert.equal((await l.characterMaterials({character_id:realLink.character_id,profile_asset_id:linked.id})).assets.actions.length,1);
 });
