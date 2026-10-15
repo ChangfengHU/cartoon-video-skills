@@ -13,6 +13,8 @@ description: 视频工作室统一入口，根据话题、素材和用户要求�
 
 ## 素材管理与选角
 
+共用背景音乐/音效依赖是 `auto-parse-audio`，由[配乐](../studio-music/SKILL.md)按其[调用契约](../studio-music/references/audio-mcp.md)执行。它与人物素材、配音、HyperFrames 混音各司其职；已有工程的音轨和资产 ID 保留。只在需要声音素材时连接，不因安装插件自动付费、批准入库或发布影片。
+
 角色、音乐、音效、姿势、场景、声线和动画组件均按 [素材管理](references/asset-management.md) 登记、检索及冻结。选角须读人物档案，不能只按外观或上次使用选人。音乐建议标签不等于听审通过，成片满意不等于逐项素材认可。
 
 音效、小物品、SVG道具缺失时使用 [素材取材](../studio-materials/SKILL.md)，获取现成素材并按角色画风处理；配乐与整片声音设计继续交 studio-music。

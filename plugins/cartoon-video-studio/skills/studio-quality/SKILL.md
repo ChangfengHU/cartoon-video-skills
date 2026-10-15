@@ -5,6 +5,8 @@ description: 对工作室实际成片与连续动作进行质量检查，记录�
 
 # 成片质量与返修
 
+采用 `auto-parse-audio` 的音轨按[音频素材契约](../studio-music/references/audio-mcp.md)核对 assetId、hash、许可、候选/批准状态和实际混音效果。资产 approved 不等于成片通过，也不授予发布权；本 Skill 只审查，不自动调用生成、批准或复用计数写操作。
+
 有锁定台词的配音必须执行 [配音完整性与返修](references/speech-integrity.md)：源配音与最终MP4各自做ASR差异检查，证据绑定当前文件哈希。漏词、错词或待解释差异不能靠技术通过抵消；使用 scripts/speech_check.py 执行内容检查。ASR一致仍不等于听审通过。
 
 从实际MP4取证，不只看HTML预览。使用 ../hyperframes/SKILL.md 路由CLI检查，按 ../cartoon-xiaban/references/quality-regression.md 对照用户指定参考片；新角色比较清晰度、表演和节奏，不要求长相相同。

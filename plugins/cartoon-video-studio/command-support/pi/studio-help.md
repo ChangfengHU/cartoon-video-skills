@@ -7,6 +7,8 @@ argument-hint: "[指令名]"
 
 按所选分支加载 cartoon-video-studio、studio-character-workflow 或 studio-quality；从已安装Skill目录找真实文件。缺少依赖报告具体缺项，不能以命令模板冒充完整技能。
 
+背景音乐与音效共用 auto-parse-audio，由 studio-music 调用；配音和混音仍用原能力。这里只说明依赖与安装，不生成、入库或修改授权。
+
 本次用户补充要求：
 
 $ARGUMENTS

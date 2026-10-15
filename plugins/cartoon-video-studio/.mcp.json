@@ -1,5 +1,9 @@
 {
   "mcpServers": {
+    "auto-parse-audio": {
+      "url": "https://auto-parse-audio.2513120790.workers.dev/mcp",
+      "bearer_token_env_var": "MCP_AUTO_PARSE_AUDIO_TOKEN"
+    },
     "vyibc-cartoon-assets": {
       "url": "https://cartoon-assets-mcp.vyibc.com/mcp",
       "bearer_token_env_var": "CARTOON_ASSETS_TOKEN"

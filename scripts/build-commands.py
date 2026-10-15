@@ -30,6 +30,12 @@ def body(name):
  if mode=='new': header+='创建原创角色并制作完整视频；明确只设计角色时才省略视频。'
  if mode in ('menu','help'): header+='空参数仅显示下列帮助，不调用生成、入库或发布。'
  routes='按所选分支加载 cartoon-video-studio、studio-character-workflow 或 studio-quality；从已安装Skill目录找真实文件。缺少依赖报告具体缺项，不能以命令模板冒充完整技能。'
+ if mode in ('character','new','revise'):
+  routes+='\n\n需要新增或更换 BGM/音效时加载 studio-music，复用已有 auto-parse-audio；先查已验收库，再检索授权来源，确认费用后才生成。保留原音轨/hash，不因角色制作或返修自动重新付费。'
+ elif mode in ('menu','help'):
+  routes+='\n\n背景音乐与音效共用 auto-parse-audio，由 studio-music 调用；配音和混音仍用原能力。这里只说明依赖与安装，不生成、入库或修改授权。'
+ elif mode=='check':
+  routes+='\n\n含 auto-parse-audio 音轨时核对来源、hash、许可及验收记录；仅检查，不生成、不批准、不写复用计数。'
  return header+'\n\n'+routes+'\n\n'
 
 def outputs():

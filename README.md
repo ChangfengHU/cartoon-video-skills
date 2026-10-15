@@ -1,13 +1,13 @@
 # 卡通视频工作室
 
-`cartoon-video-studio` 0.4.1：一个插件，多套独立角色，共用制作能力。原“下班小人视频工作室”保留安装ID，中文名称升级为卡通视频工作室。
+`cartoon-video-studio` 0.7.7：一个插件，多套独立角色，共用制作能力。原“下班小人视频工作室”保留安装ID，中文名称升级为卡通视频工作室。本版 32 个 Skill、9 个 MCP 声明；新增 auto-parse-audio 关系，详见 [音频接入与升级边界](docs/audio-mcp-relations.md)。
 
 ## 内容
 
 - 工作室入口：cartoon-video-studio；选择角色、冻结工程、组织制作与授权发布。
 - 角色：cartoon-xiaban（三根头发的下班小人）、cartoon-hongyi（红衣侧辫女生）。各有素材、声线、动作与认可参考，后续角色可独立加入。
 - 共用10个skills：hyperframes、general-video、hyperframes-core、hyperframes-cli、hyperframes-animation、hyperframes-keyframes、hyperframes-creative、hyperframes-audio、hyperframes-registry、media-use。
-- 5个HTTP MCP声明：vyibc-cartoon-assets、vyibc-image、vyibc-douyin、vyibc-youtube、vyibc-voice。分别负责素材、生图、授权发布、音频转写等；当前工具能力以服务返回为准。
+- 9个HTTP MCP声明：保留素材、生图、授权发布、配音、浏览器、金库、个人内容的原有8个连接，新增 auto-parse-audio 用于 BGM/音效库、授权检索和经确认的付费生成兜底；当前工具能力以服务返回为准。
 
 角色、视觉风格和故事形式独立。两名现有角色均属暖纸手绘，不表示工作室只能做办公室或情感独白。
 

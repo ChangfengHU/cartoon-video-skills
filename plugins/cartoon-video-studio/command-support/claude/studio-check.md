@@ -7,6 +7,8 @@ argument-hint: "[视频或工程]"
 
 按所选分支加载 cartoon-video-studio、studio-character-workflow 或 studio-quality；从已安装Skill目录找真实文件。缺少依赖报告具体缺项，不能以命令模板冒充完整技能。
 
+含 auto-parse-audio 音轨时核对来源、hash、许可及验收记录；仅检查，不生成、不批准、不写复用计数。
+
 本次用户补充要求：
 
 $ARGUMENTS

@@ -5,6 +5,8 @@ description: 为视频获取现成音效、SVG图标与小物品道具，按动�
 
 # 音效与道具取材
 
+声音素材使用已有 `auto-parse-audio`，按[共用音频 MCP](../studio-music/references/audio-mcp.md)先查 approved 音效/环境声，再检索授权来源；付费生成、候选批准与实际复用分别按该契约执行。SVG、道具、角色仍用原素材能力；MCP 缺连接时保留现有来源路线并报告，不把所有取材任务都变成音频任务。
+
 自主完成取材，不把候选选择或 A/B 试听交给用户。先复用实际合适的库存，再寻找现成素材；程序合成音效和生图按需要补充。新角色交给 vyibc-character-design，背景音乐与最终混音交给 studio-music，媒体处理复用 media-use，不另建平行素材库。
 
 ## 从镜头到素材

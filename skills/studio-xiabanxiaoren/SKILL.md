@@ -7,6 +7,8 @@ description: 下班小人：生活观察、消费与职场喜剧；用户调用�
 
 按所选分支加载 cartoon-video-studio、studio-character-workflow 或 studio-quality；从已安装Skill目录找真实文件。缺少依赖报告具体缺项，不能以命令模板冒充完整技能。
 
+需要新增或更换 BGM/音效时加载 studio-music，复用已有 auto-parse-audio；先查已验收库，再检索授权来源，确认费用后才生成。保留原音轨/hash，不因角色制作或返修自动重新付费。
+
 先读 [共用规则](../studio/references/commands.md)，帮助见 [命令目录](../studio/references/help.md)。
 
 本次要求来自调用后的用户文字，空参按规则执行；角色身份与当前音色策略以授权档案为准。
