@@ -14,7 +14,7 @@ class AudioRelations(unittest.TestCase):
  def test_audio_contract_and_references_survive_mirror(self):
   contract='skills/studio-music/references/audio-mcp.md'
   self.assertEqual((ROOT/contract).read_bytes(),(PACKAGE/contract).read_bytes())
-  for name in ['studio-music','studio-materials','cartoon-video-studio','studio-quality']:
+  for name in ['studio-music','studio-materials','cartoon-video-studio','studio-quality','cartoon-11nodes']:
    relative=f'skills/{name}/SKILL.md'
    self.assertEqual((ROOT/relative).read_bytes(),(PACKAGE/relative).read_bytes())
    links=re.findall(r'\]\(([^)]+audio-mcp\.md)\)',(PACKAGE/relative).read_text())

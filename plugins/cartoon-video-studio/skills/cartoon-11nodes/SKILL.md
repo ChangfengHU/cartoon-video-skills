@@ -17,3 +17,7 @@ description: "下班小人11节点全链路制作工坊（Stage Composing 2.0 + 
 - node-09-animator: 逐帧舞台合成（条漫四层排版引擎 + EBU R128母带混音）
 - node-10-qa: 质检审查庭（音画同步、黑帧检测与技术指标验真）
 - node-11-delivery: 交付与分发（Cloudflare R2 CDN 上传与凭证生成）
+
+## 与共享音频能力的关系
+
+node-07 需要新增 BGM／音效时，由 studio-music 按 [auto-parse-audio 调用契约](../studio-music/references/audio-mcp.md) 取得素材：已验收库优先，授权检索其次，经费用确认后生成兜底。先保存 assetId、来源许可和实际文件 hash，再交给原卡点时间轴；现有冻结音频不重生成。node-06 配音、node-09 混音和节点输出契约不变。node-08／node-10 只读核对文件与证据，不代替人工听审、不自动认可入库或记复用。缺少音频授权仅报告该分支，不能扩大旧 bootstrap 令牌权限。

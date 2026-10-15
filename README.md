@@ -7,7 +7,7 @@
 - 工作室入口：cartoon-video-studio；选择角色、冻结工程、组织制作与授权发布。
 - 角色：cartoon-xiaban（三根头发的下班小人）、cartoon-hongyi（红衣侧辫女生）。各有素材、声线、动作与认可参考，后续角色可独立加入。
 - 共用10个skills：hyperframes、general-video、hyperframes-core、hyperframes-cli、hyperframes-animation、hyperframes-keyframes、hyperframes-creative、hyperframes-audio、hyperframes-registry、media-use。
-- 9个HTTP MCP声明：保留素材、生图、授权发布、配音、浏览器、金库、个人内容的原有8个连接，新增 auto-parse-audio 用于 BGM/音效库、授权检索和经确认的付费生成兜底；当前工具能力以服务返回为准。
+- 9个HTTP MCP声明：保留素材、生图、抖音、YouTube、配音、个人内容、小红书、金库的原有8个连接，新增 auto-parse-audio 用于 BGM/音效库、授权检索和经确认的付费生成兜底；当前工具能力以服务返回为准。
 
 角色、视觉风格和故事形式独立。两名现有角色均属暖纸手绘，不表示工作室只能做办公室或情感独白。
 
