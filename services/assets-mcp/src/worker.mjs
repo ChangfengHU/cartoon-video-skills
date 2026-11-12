@@ -1,7 +1,12 @@
 import {McpServer} from '@modelcontextprotocol/server';
 import {createMcpHandler} from 'agents/mcp/server';
 import {z} from 'zod';
+import {authorizeHubInstallToken} from './hub-install-token.mjs';
 import {Library, KINDS, MATERIAL_CATEGORIES, MAX_FILE, Rejected, assert, authenticate} from './library.mjs';
+
+// Catalogue id for cartoon-assets-mcp. The catalogue credential field is MCP_TOKEN;
+// this worker stores that credential as an AUTH_CLIENTS SHA-256 record, not a raw secret.
+const CATALOGUE_MCP_ID = 'vyibc-cartoon-assets';
 
 const dictionary = z.record(z.string(), z.unknown());
 export function serverFor(library) {
@@ -29,6 +34,40 @@ export function serverFor(library) {
   tool('project_get', 'Retrieve an immutable project selection by ID from a previous session. Does not fetch original private behavior or personal voice references.', {id:z.string()}, true, ({id}) => library.load('projects',id));
   return server;
 }
+
+// Exact "Bearer <token>" form authenticate() already requires. Anything else is not a credential Hub can hash.
+function presentedBearer(request) {
+  const header = request.headers.get('Authorization') || '';
+  if (header.length >= 1024) return '';
+  const match = /^Bearer (\S+)$/.exec(header);
+  return match ? match[1] : '';
+}
+
+// Hub accepted a current install token that is not one of the stored hashes.
+// Use the single configured library scope. Do not merge distinct tenants, brands or prefixes.
+function configuredScope(env) {
+  let clients;
+  try { clients = JSON.parse(env.AUTH_CLIENTS); }
+  catch { throw new Rejected('Service authentication unavailable', 503); }
+  assert(Array.isArray(clients) && clients.length > 0 && clients.every(client => client && typeof client === 'object'), 'Service authentication unavailable', 503);
+  const same = key => new Set(clients.map(client => client[key] ?? ''));
+  assert(same('tenant').size === 1 && same('brand').size === 1 && same('prefix').size === 1 && same('legacy_prefix').size === 1, 'Invalid service credential', 401);
+  const sample = clients[0];
+  assert(/^[a-z0-9-]+\/v2$/.test(sample.prefix) && (!sample.legacy_prefix || /^[a-z0-9-]+\/v1$/.test(sample.legacy_prefix)), 'Invalid server scope', 503);
+  const permissions = [...new Set(clients.flatMap(client => Array.isArray(client.permissions) ? client.permissions : []))];
+  assert(permissions.includes('read'), 'Insufficient scope', 403);
+  return {tenant: sample.tenant, brand: sample.brand, prefix: sample.prefix, legacy_prefix: sample.legacy_prefix, permissions};
+}
+
+async function principalForMcp(request, env, accepted) {
+  if (!accepted) return authenticate(request, env);
+  try { return await authenticate(request, env); }
+  catch (error) {
+    if (!(error instanceof Rejected) || error.status !== 401) throw error;
+    return configuredScope(env);
+  }
+}
+
 export default {
   async fetch(request, env, ctx) {
     try {
@@ -36,7 +75,19 @@ export default {
       if (url.pathname === '/health' && request.method === 'GET') return Response.json({service:'vyibc-cartoon-assets',version:'1.3.0',authentication:'required',tools:15});
       // Non-browser MCP clients work; no ambient-cookie or wildcard browser access.
       assert(!request.headers.has('Origin') || request.headers.get('Origin') === url.origin, 'Origin denied', 403);
-      const principal = await authenticate(request,env);
+      // One Hub authorisation per authenticated /mcp request, before a tool runs.
+      // 200 accepts the caller. 409 is returned as Hub sent it, even when the bearer matches AUTH_CLIENTS.
+      // 401 install_token_unknown, any other status, and an unreachable Hub keep the existing AUTH_CLIENTS check.
+      let accepted = false;
+      if (url.pathname === '/mcp') {
+        const bearer = presentedBearer(request);
+        if (bearer) {
+          const decision = await authorizeHubInstallToken(CATALOGUE_MCP_ID, bearer);
+          if (decision.action === 'upgrade') return Response.json(decision.body, {status: 409, headers: {'Cache-Control': 'no-store'}});
+          accepted = decision.action === 'accept';
+        }
+      }
+      const principal = url.pathname === '/mcp' ? await principalForMcp(request, env, accepted) : await authenticate(request, env);
       const library = new Library(env.LIBRARY,principal,url.origin);
       if (url.pathname === '/mcp') return createMcpHandler(() => serverFor(library),{responseMode:'json',corsOptions:false,allowedHostnames:[url.hostname],allowedOriginHostnames:[url.hostname]})(request,env,ctx);
       const match = url.pathname.match(/^\/v1\/assets\/([a-f0-9-]+)\/file$/);
